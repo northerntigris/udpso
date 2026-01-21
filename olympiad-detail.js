@@ -60,6 +60,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         loadJuryMembers(window.currentOlympiadId);
       } else if (actions) {
         actions.style.display = 'none';
+        const participantsTable = document.getElementById('participants-table');
+        if (participantsTable) {
+          participantsTable.classList.add('public-view');
+        }
       }
       title.textContent = `${olympiad.title} — ${olympiad.subject}`;
       window.currentOlympiadStatus = olympiad.status;
