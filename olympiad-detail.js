@@ -3,11 +3,30 @@ document.addEventListener('DOMContentLoaded', async () => {
   const id = params.get('id');
   const title = document.getElementById('olympiad-title');
   const editBtn = document.getElementById('edit-info-btn');
+  const actions = document.getElementById('actions');
+  const participantsSection = document.getElementById('participants-table')?.closest('.olympiad-section');
+  const jurySection = document.getElementById('jury-block');
+  let isOrganizer = false;
 
   if (!id) {
     title.textContent = 'Олимпиада не найдена';
-    document.getElementById('actions').style.display = 'none';
+    if (actions) {
+      actions.style.display = 'none';
+    }
     return;
+  }
+
+  async function fetchUserRole() {
+    try {
+      const res = await fetch('check-auth.php');
+      const data = await res.json();
+      if (res.ok && data.success) {
+        return data.user_role || null;
+      }
+    } catch (error) {
+      console.error('Ошибка проверки авторизации:', error);
+    }
+    return null;
   }
 
   async function fetchOlympiadDetails(olympiadId) {
@@ -29,18 +48,26 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   try {
+    const role = await fetchUserRole();
+    isOrganizer = role === 'organizer';
     const olympiad = await fetchOlympiadDetails(id);
 
     if (olympiad && olympiad.title) {
-      loadParticipants(id);
       window.currentOlympiadId = olympiad.id;
 
-      loadJuryMembers(window.currentOlympiadId);
+      if (isOrganizer) {
+        loadParticipants(id);
+        loadJuryMembers(window.currentOlympiadId);
+      } else {
+        if (actions) actions.style.display = 'none';
+        if (participantsSection) participantsSection.style.display = 'none';
+        if (jurySection) jurySection.style.display = 'none';
+      }
       title.textContent = `${olympiad.title} — ${olympiad.subject}`;
       window.currentOlympiadStatus = olympiad.status;
 
       // Скрыть кнопку редактирования, если статус не "ожидается"
-      if (olympiad.status !== 'upcoming') {
+      if (olympiad.status !== 'upcoming' || !isOrganizer) {
         editBtn.style.display = 'none';
       }
 
@@ -63,11 +90,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         <p><strong>Статус:</strong> ${statusText(olympiad.status)}</p>
         <p><strong>Описание:</strong><br>${olympiad.description || '—'}</p>
       `;
+    } else {
+      title.textContent = 'Олимпиада не найдена';
+      if (actions) actions.style.display = 'none';
+    }
 
   } catch (error) {
     console.error('Ошибка загрузки олимпиады:', error);
     title.textContent = 'Олимпиада не найдена';
-    document.getElementById('actions').style.display = 'none';
+    if (actions) {
+      actions.style.display = 'none';
+    }
   }
 
   document.getElementById('close-jury-modal').addEventListener('click', () => {
