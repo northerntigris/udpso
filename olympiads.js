@@ -14,8 +14,6 @@ document.addEventListener('DOMContentLoaded', () => {
   let isLoading = false;
   const defaultEmptyText = emptyState ? emptyState.textContent.trim() : '';
 
-  regionToggle.innerHTML = 'Выберите регион<i class="fas fa-chevron-down"></i>';
-
   const regions = [
     'Все регионы',
     'Республика Адыгея',
