@@ -10,8 +10,9 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
-  let currentRegion = 'all';
+  let currentRegion = '';
   let isLoading = false;
+  const defaultEmptyText = emptyState ? emptyState.textContent.trim() : '';
 
   const regions = [
     'Все регионы',
@@ -114,6 +115,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     regionOptions.innerHTML = '';
+
+    const label = document.createElement('li');
+    label.className = 'region-select__label';
+    label.textContent = 'Выберите регион';
+    regionOptions.appendChild(label);
+
     options.forEach(region => {
       const li = document.createElement('li');
       li.className = 'region-select__option';
@@ -145,6 +152,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  function setEmptyState(message, isVisible) {
+    if (!emptyState) return;
+    if (message) {
+      emptyState.textContent = message;
+    } else {
+      emptyState.textContent = defaultEmptyText;
+    }
+    emptyState.classList.toggle('hidden', !isVisible);
+  }
+
   function formatDate(value) {
     if (!value) return '';
     const date = new Date(value);
@@ -156,9 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
     isLoading = state;
     if (state) {
       olympiadList.innerHTML = '<p class="loading">Загрузка...</p>';
-      if (emptyState) {
-        emptyState.classList.add('hidden');
-      }
+      setEmptyState('', false);
     }
   }
 
@@ -166,29 +181,45 @@ document.addEventListener('DOMContentLoaded', () => {
     olympiadList.innerHTML = '';
 
     if (!items.length) {
-      if (emptyState) {
-        emptyState.classList.remove('hidden');
-      }
+      setEmptyState('', true);
       return;
     }
 
-    if (emptyState) {
-      emptyState.classList.add('hidden');
-    }
+    setEmptyState('', false);
 
     items.forEach(olympiad => {
       const card = document.createElement('div');
       card.className = 'olympiad-card';
       card.dataset.region = olympiad.region || '';
       card.innerHTML = `
-        <h3>${olympiad.title}</h3>
-        <p>Регион: ${olympiad.region || 'Не указан'}</p>
-        <p>Школа: ${olympiad.school_name || 'Не указана'}</p>
-        <p>Предмет: ${olympiad.subject}</p>
-        <p>Классы: ${olympiad.grades}</p>
-        <p>Дата проведения: ${formatDate(olympiad.datetime)}</p>
-        <span class="status-tag status-${olympiad.status}">${mapStatus(olympiad.status)}</span>
-        <button class="btn">Подробнее</button>
+        <div class="olympiad-card__header">
+          <div>
+            <h3>${olympiad.title}</h3>
+            <p class="olympiad-card__school">${olympiad.school_name || 'Школа не указана'}</p>
+          </div>
+          <span class="status-tag status-${olympiad.status}">${mapStatus(olympiad.status)}</span>
+        </div>
+        <div class="olympiad-card__meta">
+          <div>
+            <span class="olympiad-card__label">Регион</span>
+            <span>${olympiad.region || 'Не указан'}</span>
+          </div>
+          <div>
+            <span class="olympiad-card__label">Предмет</span>
+            <span>${olympiad.subject}</span>
+          </div>
+          <div>
+            <span class="olympiad-card__label">Классы</span>
+            <span>${olympiad.grades}</span>
+          </div>
+          <div>
+            <span class="olympiad-card__label">Дата проведения</span>
+            <span>${formatDate(olympiad.datetime)}</span>
+          </div>
+        </div>
+        <div class="olympiad-card__footer">
+          <button class="btn">Подробнее</button>
+        </div>
       `;
 
       const button = card.querySelector('button');
@@ -204,6 +235,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function loadOlympiads() {
     if (isLoading) return;
+    if (!currentRegion) {
+      olympiadList.innerHTML = '';
+      setEmptyState('Выберите регион для просмотра олимпиад.', true);
+      return;
+    }
     setLoading(true);
 
     try {
@@ -218,9 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (error) {
       console.error('Ошибка загрузки олимпиад:', error);
       olympiadList.innerHTML = '<p class="error-message">Ошибка загрузки данных.</p>';
-      if (emptyState) {
-        emptyState.classList.add('hidden');
-      }
+      setEmptyState('', false);
     } finally {
       setLoading(false);
     }
