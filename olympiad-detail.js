@@ -58,10 +58,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (isOrganizer) {
         loadParticipants(id);
         loadJuryMembers(window.currentOlympiadId);
-      } else {
-        if (actions) actions.style.display = 'none';
-        if (participantsSection) participantsSection.style.display = 'none';
-        if (jurySection) jurySection.style.display = 'none';
+      } else if (actions) {
+        actions.style.display = 'none';
       }
       title.textContent = `${olympiad.title} — ${olympiad.subject}`;
       window.currentOlympiadStatus = olympiad.status;
