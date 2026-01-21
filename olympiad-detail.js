@@ -1,12 +1,14 @@
 document.addEventListener('DOMContentLoaded', async () => {
   const params = new URLSearchParams(window.location.search);
   const id = params.get('id');
+  const mode = params.get('mode');
   const title = document.getElementById('olympiad-title');
   const editBtn = document.getElementById('edit-info-btn');
   const actions = document.getElementById('actions');
   const participantsSection = document.getElementById('participants-table')?.closest('.olympiad-section');
   const jurySection = document.getElementById('jury-block');
   let isOrganizer = false;
+  const isOrganizerView = mode === 'organizer';
 
   if (!id) {
     title.textContent = 'Олимпиада не найдена';
@@ -55,7 +57,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (olympiad && olympiad.title) {
       window.currentOlympiadId = olympiad.id;
 
-      if (isOrganizer) {
+      if (isOrganizer && isOrganizerView) {
         loadParticipants(id);
         loadJuryMembers(window.currentOlympiadId);
       } else if (actions) {
@@ -69,7 +71,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       window.currentOlympiadStatus = olympiad.status;
 
       // Скрыть кнопку редактирования, если статус не "ожидается"
-      if (olympiad.status !== 'upcoming' || !isOrganizer) {
+      if (olympiad.status !== 'upcoming' || !isOrganizer || !isOrganizerView) {
         editBtn.style.display = 'none';
       }
 

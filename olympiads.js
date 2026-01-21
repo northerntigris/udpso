@@ -225,7 +225,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const button = card.querySelector('button');
       if (button) {
         button.addEventListener('click', () => {
-          window.location.href = `olympiad-detail.html?id=${olympiad.id}`;
+          window.location.href = `olympiad-detail.html?id=${olympiad.id}&mode=public`;
         });
       }
 
