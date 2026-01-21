@@ -97,6 +97,11 @@
   text-align: center;
 }
 
+.participants-table.public-view th:nth-child(4),
+.participants-table.public-view td:nth-child(4) {
+  display: none;
+}
+
 #participant-modal .modal-content {
   max-width: 500px;
   padding: 24px;
