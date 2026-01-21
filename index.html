@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Единая цифровая платформа школьных олимпиад</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body data-page="index">
+    <div class="overlay" id="overlay"></div>
+    <div class="container">
+        <!-- Основное содержимое -->
+        <main class="main-content" id="main-content">
+            <div class="content-header">
+                <button class="mobile-toggle-btn" id="mobile-toggle-btn">
+                    <i class="fas fa-bars"></i>
+                    <span>Меню</span>
+                </button>
+                <h1 class="page-title">Главная</h1>
+                <div class="register-tooltip">
+                    <button id="register-school-btn" class="btn btn-accent">
+                        <i class="fas fa-school"></i>
+                        <span>Присоединиться к платформе</span>
+                    </button>
+                    <span class="tooltip-text">Для регистрации образовательного учреждения</span>
+                </div>
+            </div>
+            <div class="card">
+                <h2 class="card-title news">Новости и объявления</h2>
+                <div id="news-container"></div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js" type="module"></script>
+</body>
+</html>

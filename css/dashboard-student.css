@@ -1,0 +1,132 @@
+.welcome-box .welcome-text {
+  font-size: 1rem;
+  color: #2c3e50;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+/* Контейнер секции */
+.dashboard-section {
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 20px 25px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  margin-top: 20px;
+}
+
+/* Заголовок секции */
+.section-title {
+  font-size: 1.4rem;
+  margin-bottom: 20px;
+  color: #34495e;
+}
+
+/* Таблица */
+.olympiads-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.olympiads-table thead {
+  background-color: #f8f9fa;
+}
+
+.olympiads-table th,
+.olympiads-table td {
+  padding: 12px 10px;
+  text-align: center;
+  border-bottom: 1px solid #e9e9e9;
+}
+
+.olympiads-table tbody tr:nth-child(odd) {
+  background-color: #fafafa;
+}
+
+.olympiads-table tbody tr:hover {
+  background-color: #f0f8ff;
+  transition: background-color 0.2s ease-in-out;
+}
+
+/* Ссылки "Скачать" */
+.olympiads-table a {
+  color: #ffffff;
+  background-color: #3498db;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-weight: 500;
+  text-decoration: none;
+  font-size: 14px;
+  display: inline-block;
+}
+
+.olympiads-table a:hover {
+  background-color: #2980b9;
+}
+
+/* Адаптивность */
+@media screen and (max-width: 768px) {
+  .olympiads-table,
+  .olympiads-table thead,
+  .olympiads-table tbody,
+  .olympiads-table th,
+  .olympiads-table td,
+  .olympiads-table tr {
+    display: block;
+  }
+
+  .olympiads-table thead tr {
+    display: none;
+  }
+
+  .olympiads-table td {
+    position: relative;
+    padding-left: 50%;
+    text-align: left;
+    border: none;
+    border-bottom: 1px solid #e0e0e0;
+  }
+
+  .olympiads-table td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 10px;
+    top: 12px;
+    font-weight: 600;
+    color: #555;
+  }
+}
+
+.status-tag {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  width: fit-content;
+}
+
+/* Цвета статусов */
+.status-upcoming {
+  background-color: #f1c40f;
+  color: #fff;
+}
+
+.status-ongoing {
+  background-color: #3498db;
+  color: #fff;
+}
+
+.status-completed {
+  background-color: #2ecc71;
+  color: #fff;
+}
+
+.status-cancelled {
+  background-color: #e74c3c;
+  color: #fff;
+}
