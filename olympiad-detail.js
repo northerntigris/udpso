@@ -10,9 +10,26 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
+  async function fetchOlympiadDetails(olympiadId) {
+    const res = await fetch(`api/get-olympiad.php?id=${olympiadId}`);
+    const data = await res.json();
+    if (res.ok && data && !data.error) {
+      return data;
+    }
+
+    if (data && data.error === 'Unauthorized') {
+      const publicRes = await fetch(`api/get-public-olympiad.php?id=${olympiadId}`);
+      const publicData = await publicRes.json();
+      if (publicRes.ok && publicData && !publicData.error) {
+        return publicData;
+      }
+    }
+
+    throw new Error((data && data.error) || 'Ошибка загрузки олимпиады');
+  }
+
   try {
-    const res = await fetch(`api/get-olympiad.php?id=${id}`);
-    const olympiad = await res.json();
+    const olympiad = await fetchOlympiadDetails(id);
 
     if (olympiad && olympiad.title) {
       loadParticipants(id);
@@ -47,13 +64,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         <p><strong>Описание:</strong><br>${olympiad.description || '—'}</p>
       `;
 
-    } else {
-      title.textContent = 'Олимпиада не найдена';
-      document.getElementById('actions').style.display = 'none';
-    }
   } catch (error) {
     console.error('Ошибка загрузки олимпиады:', error);
-    title.textContent = 'Ошибка загрузки олимпиады';
+    title.textContent = 'Олимпиада не найдена';
+    document.getElementById('actions').style.display = 'none';
   }
 
   document.getElementById('close-jury-modal').addEventListener('click', () => {
