@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   let currentRegion = 'all';
+  let isLoading = false;
 
   const regions = [
     'Все регионы',
@@ -127,27 +128,101 @@ document.addEventListener('DOMContentLoaded', () => {
         regionSelect.classList.remove('open');
         regionSearch.value = '';
         renderRegionOptions();
-        filterOlympiads();
+        loadOlympiads();
       });
       regionOptions.appendChild(li);
     });
   }
 
-  function filterOlympiads() {
-    const cards = Array.from(olympiadList.querySelectorAll('.olympiad-card'));
-    let visibleCount = 0;
+  function mapStatus(status) {
+    switch (status) {
+      case 'upcoming':
+        return 'Ожидается';
+      case 'ongoing':
+        return 'В процессе';
+      default:
+        return 'Неизвестно';
+    }
+  }
 
-    cards.forEach(card => {
-      const region = card.dataset.region || '';
-      const isVisible = currentRegion === 'all' || region === currentRegion;
-      card.classList.toggle('hidden', !isVisible);
-      if (isVisible) {
-        visibleCount += 1;
+  function formatDate(value) {
+    if (!value) return '';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return value;
+    return date.toLocaleString('ru-RU');
+  }
+
+  function setLoading(state) {
+    isLoading = state;
+    if (state) {
+      olympiadList.innerHTML = '<p class="loading">Загрузка...</p>';
+      if (emptyState) {
+        emptyState.classList.add('hidden');
       }
-    });
+    }
+  }
+
+  function renderOlympiads(items = []) {
+    olympiadList.innerHTML = '';
+
+    if (!items.length) {
+      if (emptyState) {
+        emptyState.classList.remove('hidden');
+      }
+      return;
+    }
 
     if (emptyState) {
-      emptyState.classList.toggle('hidden', visibleCount > 0);
+      emptyState.classList.add('hidden');
+    }
+
+    items.forEach(olympiad => {
+      const card = document.createElement('div');
+      card.className = 'olympiad-card';
+      card.dataset.region = olympiad.region || '';
+      card.innerHTML = `
+        <h3>${olympiad.title}</h3>
+        <p>Регион: ${olympiad.region || 'Не указан'}</p>
+        <p>Школа: ${olympiad.school_name || 'Не указана'}</p>
+        <p>Предмет: ${olympiad.subject}</p>
+        <p>Классы: ${olympiad.grades}</p>
+        <p>Дата проведения: ${formatDate(olympiad.datetime)}</p>
+        <span class="status-tag status-${olympiad.status}">${mapStatus(olympiad.status)}</span>
+        <button class="btn">Подробнее</button>
+      `;
+
+      const button = card.querySelector('button');
+      if (button) {
+        button.addEventListener('click', () => {
+          window.location.href = `olympiad-detail.html?id=${olympiad.id}`;
+        });
+      }
+
+      olympiadList.appendChild(card);
+    });
+  }
+
+  async function loadOlympiads() {
+    if (isLoading) return;
+    setLoading(true);
+
+    try {
+      await fetch('api/update-olympiad-statuses.php');
+      const regionParam = encodeURIComponent(currentRegion);
+      const response = await fetch(`api/get-public-olympiads.php?region=${regionParam}`);
+      const data = await response.json();
+      if (!response.ok || data.success === false) {
+        throw new Error(data.error || 'Ошибка загрузки данных');
+      }
+      renderOlympiads(data.olympiads || []);
+    } catch (error) {
+      console.error('Ошибка загрузки олимпиад:', error);
+      olympiadList.innerHTML = '<p class="error-message">Ошибка загрузки данных.</p>';
+      if (emptyState) {
+        emptyState.classList.add('hidden');
+      }
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -169,5 +244,5 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   renderRegionOptions();
-  filterOlympiads();
+  loadOlympiads();
 });
