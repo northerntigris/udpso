@@ -155,7 +155,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         form.reset();
         document.getElementById('add-student-modal').classList.remove('open');
         document.body.classList.remove('no-scroll');
-        // В будущем: обновить список участников
+        if (window.currentOlympiadId) {
+          loadParticipants(window.currentOlympiadId);
+        }
       } else {
         alert('Ошибка: ' + (result.error || 'Не удалось добавить участника'));
       }
@@ -423,6 +425,9 @@ async function loadParticipants(olympiadId) {
   try {
     const res = await fetch(`api/get-olympiad-participants.php?id=${olympiadId}`);
     const participants = await res.json();
+    if (!res.ok || participants.error) {
+      throw new Error(participants.error || 'Ошибка загрузки участников');
+    }
     const table = document.getElementById('participants-table');
     const placeholder = document.getElementById('participants-placeholder');
     const tbody = table.querySelector('tbody');
