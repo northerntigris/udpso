@@ -84,7 +84,7 @@
           <input type="number" name="grade" min="1" max="11" required />
         </label>
         <label>СНИЛС
-          <input type="text" name="snils" pattern="\d{11}" required />
+          <input type="text" name="snils" pattern="(\d{3}-\d{3}-\d{3} \d{2}|\d{11})" placeholder="000-000-000 00" required />
         </label>
         <label>Email (необязательно)
           <input type="email" name="email" />
