@@ -42,7 +42,7 @@ try {
     }
 
     // Валидация
-    if ($fullName === '' || $username === '' || $password === '' || $grade === null) {
+    if ($fullName === '' || $grade === null || $age === null) {
         http_response_code(400);
         echo json_encode(['success' => false, 'error' => 'Заполните обязательные поля'], JSON_UNESCAPED_UNICODE);
         exit;
@@ -53,6 +53,14 @@ try {
         http_response_code(400);
         echo json_encode(['success' => false, 'error' => 'СНИЛС должен содержать 11 цифр'], JSON_UNESCAPED_UNICODE);
         exit;
+    }
+
+    if ($username === '') {
+        $username = 'student_' . time() . '_' . random_int(1000, 9999);
+    }
+
+    if ($password === '') {
+        $password = bin2hex(random_bytes(4));
     }
 
     // Хеш пароля
