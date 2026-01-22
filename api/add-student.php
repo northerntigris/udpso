@@ -30,7 +30,12 @@ try {
     // Школа обычно берётся от организатора (как у тебя по проекту)
     $schoolId = isset($_SESSION['school_id']) ? (int)$_SESSION['school_id'] : null;
     if ($schoolId === null || $schoolId <= 0) {
-        // Если у тебя в сессии школа хранится иначе — скажи, подстрою
+        $stmt = $pdo->prepare("SELECT school_id FROM users WHERE id = ?");
+        $stmt->execute([$_SESSION['user_id']]);
+        $schoolId = (int)$stmt->fetchColumn();
+    }
+
+    if ($schoolId <= 0) {
         http_response_code(400);
         echo json_encode(['success' => false, 'error' => 'Не определена школа организатора'], JSON_UNESCAPED_UNICODE);
         exit;
@@ -40,6 +45,13 @@ try {
     if ($fullName === '' || $username === '' || $password === '' || $grade === null) {
         http_response_code(400);
         echo json_encode(['success' => false, 'error' => 'Заполните обязательные поля'], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    $snilsDigits = preg_replace('/\\D+/', '', $snils);
+    if ($snilsDigits !== '' && strlen($snilsDigits) !== 11) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'error' => 'СНИЛС должен содержать 11 цифр'], JSON_UNESCAPED_UNICODE);
         exit;
     }
 
@@ -61,7 +73,7 @@ try {
         ':full_name' => $fullName,
         ':age'       => $age,
         ':grade'     => $grade,
-        ':snils'     => ($snils !== '' ? $snils : null),
+        ':snils'     => ($snilsDigits !== '' ? $snilsDigits : null),
         ':email'     => ($email !== '' ? $email : null),
         ':school_id' => $schoolId
     ]);
