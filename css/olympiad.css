@@ -98,6 +98,15 @@
   gap: 4px;
 }
 
+.region-select__label {
+  padding: 6px 10px;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #8a8a8a;
+  cursor: default;
+}
+
 .region-select__option {
   padding: 8px 10px;
   border-radius: 8px;
@@ -121,6 +130,9 @@
   border-top: 4px solid var(--accent-color);
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .olympiad-card:hover {
@@ -130,14 +142,51 @@
 
 .olympiad-card h3 {
   color: var(--dark-color);
-  margin-bottom: 10px;
+  margin-bottom: 6px;
   font-weight: 600;
 }
 
 .olympiad-card p {
   color: #6c757d;
-  margin-bottom: 15px;
   font-size: 0.9rem;
+}
+
+.olympiad-card__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.olympiad-card__school {
+  margin: 0;
+  font-weight: 500;
+  color: #3f4b57;
+}
+
+.olympiad-card__meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.olympiad-card__meta span {
+  display: block;
+  font-size: 0.88rem;
+  color: #5f6b76;
+}
+
+.olympiad-card__label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #9aa5b1;
+  margin-bottom: 4px;
+}
+
+.olympiad-card__footer {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .olympiad-card .btn {
