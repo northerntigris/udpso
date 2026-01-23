@@ -55,6 +55,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const olympiad = await fetchOlympiadDetails(id);
 
     if (olympiad && olympiad.title) {
+      window.currentOlympiad = olympiad;
       window.currentOlympiadId = olympiad.id;
 
       if (isOrganizer && isOrganizerView) {
@@ -80,6 +81,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       const infoBlock = document.getElementById('info-placeholder');
       const format = date => new Date(date).toLocaleString();
+      const formatInputDate = date => {
+        const value = new Date(date);
+        if (Number.isNaN(value.getTime())) return '';
+        const pad = num => String(num).padStart(2, '0');
+        return `${value.getFullYear()}-${pad(value.getMonth() + 1)}-${pad(value.getDate())}T${pad(value.getHours())}:${pad(value.getMinutes())}`;
+      };
       const statusText = s => {
         switch (s) {
           case 'upcoming': return 'Ожидается';
@@ -97,6 +104,86 @@ document.addEventListener('DOMContentLoaded', async () => {
         <p><strong>Статус:</strong> ${statusText(olympiad.status)}</p>
         <p><strong>Описание:</strong><br>${olympiad.description || '—'}</p>
       `;
+
+      editBtn?.addEventListener('click', () => {
+        if (!isOrganizer || !isOrganizerView) {
+          return;
+        }
+
+        const current = window.currentOlympiad;
+        if (!current) return;
+
+        infoBlock.innerHTML = `
+          <form id="edit-olympiad-form" class="modal-body">
+            <label>Название
+              <input type="text" name="title" value="${current.title}" required>
+            </label>
+            <label>Предмет
+              <input type="text" name="subject" value="${current.subject}" required>
+            </label>
+            <label>Дата и время
+              <input type="datetime-local" name="datetime" value="${formatInputDate(current.datetime)}" required>
+            </label>
+            <label>Классы
+              <input type="text" name="grades" value="${current.grades}" required>
+            </label>
+            <label>Описание
+              <textarea name="description" rows="4">${current.description || ''}</textarea>
+            </label>
+            <div class="modal-footer">
+              <button type="submit" class="btn-submit">Сохранить</button>
+              <button type="button" class="btn-action" id="cancel-edit-olympiad">Отмена</button>
+            </div>
+          </form>
+        `;
+
+        document.getElementById('cancel-edit-olympiad')?.addEventListener('click', () => {
+          infoBlock.innerHTML = `
+            <p><strong>Предмет:</strong> ${current.subject}</p>
+            <p><strong>Дата и время:</strong> ${format(current.datetime)}</p>
+            <p><strong>Классы:</strong> ${current.grades}</p>
+            <p><strong>Статус:</strong> ${statusText(current.status)}</p>
+            <p><strong>Описание:</strong><br>${current.description || '—'}</p>
+          `;
+        });
+
+        document.getElementById('edit-olympiad-form')?.addEventListener('submit', async (event) => {
+          event.preventDefault();
+          const form = event.target;
+          if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+          }
+          const formData = new FormData(form);
+          const payload = Object.fromEntries(formData.entries());
+          payload.id = window.currentOlympiadId;
+
+          try {
+            const res = await fetch('api/update-olympiad.php', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (!res.ok || data.error) {
+              throw new Error(data.error || 'Ошибка сохранения');
+            }
+
+            window.currentOlympiad = { ...current, ...payload };
+            title.textContent = `${payload.title} — ${payload.subject}`;
+            infoBlock.innerHTML = `
+              <p><strong>Предмет:</strong> ${payload.subject}</p>
+              <p><strong>Дата и время:</strong> ${format(payload.datetime)}</p>
+              <p><strong>Классы:</strong> ${payload.grades}</p>
+              <p><strong>Статус:</strong> ${statusText(current.status)}</p>
+              <p><strong>Описание:</strong><br>${payload.description || '—'}</p>
+            `;
+          } catch (err) {
+            console.error('Ошибка сохранения олимпиады:', err);
+            alert('Не удалось сохранить изменения.');
+          }
+        });
+      });
     } else {
       title.textContent = 'Олимпиада не найдена';
       if (actions) actions.style.display = 'none';

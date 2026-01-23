@@ -133,16 +133,18 @@
         </label>
 
         <!-- Чекбокс: использовать организацию организатора -->
-        <input type="checkbox" id="same-organization-checkbox"> 
-        <label for="same-organization-checkbox">Использовать организацию</label>
+        <label class="checkbox-field" for="same-organization-checkbox">
+          <input type="checkbox" id="same-organization-checkbox">
+          Использовать организацию
+        </label>
 
         <!-- Паспорт -->
         <label for="passport-series">Серия паспорта:
-          <input type="text" id="passport-series" name="passport_series" maxlength="4" required>
+          <input type="text" id="passport-series" name="passport_series" maxlength="4" pattern="\\d{4}" title="Введите 4 цифры" required>
         </label>
 
         <label for="passport-number">Номер паспорта:
-          <input type="text" id="passport-number" name="passport_number" maxlength="6" required>
+          <input type="text" id="passport-number" name="passport_number" maxlength="6" pattern="\\d{6}" title="Введите 6 цифр" required>
         </label>
 
         <label for="passport-issued-by">Кем выдан:
@@ -160,12 +162,17 @@
 
         <!-- СНИЛС -->
         <label for="snils">СНИЛС:
-          <input type="text" id="snils" name="snils" required>
+          <input type="text" id="snils" name="snils" pattern="(\\d{3}-\\d{3}-\\d{3} \\d{2}|\\d{11})" placeholder="000-000-000 00" title="Введите СНИЛС в формате 000-000-000 00 или 11 цифр" required>
+        </label>
+
+        <!-- Email -->
+        <label for="expert-email">Email:
+          <input type="email" id="expert-email" name="email" placeholder="name@example.com" required>
         </label>
 
         <!-- Роль -->
         <label for="expert-role">Роль:
-          <select id="expert-role" name="role" required>
+          <select id="expert-role" name="jury_role" required>
             <option value="председатель жюри">Председатель жюри</option>
             <option value="заместитель председателя жюри">Заместитель председателя жюри</option>
             <option value="член жюри">Член жюри</option>

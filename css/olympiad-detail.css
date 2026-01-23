@@ -45,6 +45,19 @@
 .action-buttons button:hover {
     background: #2c80b4;
 }
+
+.checkbox-field {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    color: #333;
+    margin-bottom: 12px;
+}
+
+.checkbox-field input[type="checkbox"] {
+    margin: 0;
+}
     
 .olympiad-section {
     margin-top: 24px;
