@@ -6,11 +6,36 @@ document.addEventListener('DOMContentLoaded', () => {
   const checkbox = document.getElementById('same-organization-checkbox');
   const orgInput = document.getElementById('expert-organization');
 
+  if (!modal || !form || !checkbox || !orgInput) {
+    return;
+  }
+
+  let organizerOrganization = null;
+
+  async function loadOrganizerOrganization() {
+    if (organizerOrganization) {
+      return organizerOrganization;
+    }
+
+    try {
+      const res = await fetch('api/get-organizer-organization.php');
+      const data = await res.json();
+      if (res.ok && data.success) {
+        organizerOrganization = data.organization;
+        return organizerOrganization;
+      }
+    } catch (error) {
+      console.error('Ошибка загрузки организации организатора:', error);
+    }
+
+    return null;
+  }
+
   // Автоподстановка организации (если включено)
-  checkbox.addEventListener('change', () => {
+  checkbox.addEventListener('change', async () => {
     if (checkbox.checked) {
-      // заменить на реальную переменную, если она доступна в JS:
-      orgInput.value = window.organizerOrganizationName || 'Организация организатора';
+      const organization = await loadOrganizerOrganization();
+      orgInput.value = organization || '';
       orgInput.readOnly = true;
     } else {
       orgInput.readOnly = false;
@@ -19,22 +44,27 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Открыть модалку
-  openBtn.addEventListener('click', () => {
+  openBtn?.addEventListener('click', () => {
     modal.style.display = 'flex';
     document.body.classList.add('no-scroll');
   });
 
   // Закрыть модалку
-  closeBtn.addEventListener('click', () => {
+  closeBtn?.addEventListener('click', () => {
     modal.style.display = 'none';
     document.body.classList.remove('no-scroll');
     form.reset();
-    orgInput.disabled = false;
+    orgInput.readOnly = false;
   });
 
   // Отправка формы
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
 
     const formData = new FormData(form);
     formData.append('olympiad_id', window.currentOlympiadId); // предполагается, что ID олимпиады передаётся глобально
@@ -52,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
         modal.style.display = 'none';
         document.body.classList.remove('no-scroll');
         form.reset();
-        orgInput.disabled = false;
+        orgInput.readOnly = false;
         // TODO: обновить список экспертов в таблице
       } else {
         alert('Ошибка: ' + (data.error || 'Не удалось добавить эксперта.'));
