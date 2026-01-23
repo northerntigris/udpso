@@ -23,6 +23,10 @@
     display: flex;
     gap: 10px;
 }
+
+.hidden {
+    display: none !important;
+}
     
 .action-buttons button {
     padding: 8px 14px;
