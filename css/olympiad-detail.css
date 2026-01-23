@@ -23,6 +23,10 @@
     display: flex;
     gap: 10px;
 }
+
+.hidden {
+    display: none !important;
+}
     
 .action-buttons button {
     padding: 8px 14px;
@@ -95,6 +99,11 @@
 .participants-table td:last-child,
 .participants-table th:last-child {
   text-align: center;
+}
+
+.participants-table.public-view th:nth-child(4),
+.participants-table.public-view td:nth-child(4) {
+  display: none;
 }
 
 #participant-modal .modal-content {

@@ -13,7 +13,7 @@
       <div class="olympiad-detail-container">
         <div class="olympiad-header">
           <h1 id="olympiad-title">Олимпиада #...</h1>
-          <div class="action-buttons" id="actions">
+          <div class="action-buttons hidden" id="actions">
             <button id="add-student-btn"><i class="fas fa-user-plus"></i> Участник</button>
             <button id="edit-info-btn"><i class="fas fa-edit"></i> Редактировать</button>
             <button id="add-expert-btn"><i class="fas fa-users"></i> Эксперты</button>
@@ -84,7 +84,7 @@
           <input type="number" name="grade" min="1" max="11" required />
         </label>
         <label>СНИЛС
-          <input type="text" name="snils" pattern="\d{11}" required />
+          <input type="text" name="snils" pattern="(\d{3}-\d{3}-\d{3} \d{2}|\d{11})" placeholder="000-000-000 00" required />
         </label>
         <label>Email (необязательно)
           <input type="email" name="email" />
