@@ -60,6 +60,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (isOrganizer && isOrganizerView) {
         loadParticipants(id);
         loadJuryMembers(window.currentOlympiadId);
+        if (actions) {
+          actions.classList.remove('hidden');
+        }
       } else if (actions) {
         actions.style.display = 'none';
         const participantsTable = document.getElementById('participants-table');
