@@ -53,10 +53,12 @@
     font-size: 0.95rem;
     color: #333;
     margin-bottom: 12px;
+    font-weight: 500;
 }
 
 .checkbox-field input[type="checkbox"] {
     margin: 0;
+    width: auto;
 }
     
 .olympiad-section {
