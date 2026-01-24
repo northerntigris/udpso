@@ -136,9 +136,9 @@ export class SidebarLoader {
             const dashboardHref = {
                 admin: 'dashboard-admin.html',
                 moderator: 'dashboard-admin.html',
-                expert: 'dashboard-admin.html',
+                expert: 'dashboard-jury.html',
                 organizer: 'dashboard-organizer.html',
-            }[userRole] || 'index.html';    
+            }[userRole] || 'index.html';
 
             if (['admin', 'moderator', 'organizer', 'expert'].includes(userRole)) {
                 // Добавляем кнопку "Панель управления" для привилегированных ролей
