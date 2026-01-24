@@ -84,7 +84,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         juryRole = await fetchJuryRole(id);
         isJuryChairman = juryRole === 'председатель жюри';
         const canScore = isJuryChairman && olympiad.status === 'completed';
-        loadParticipants(id, { allowScoreEdit: canScore, allowUpload: isJuryChairman });
+        const canUpload = isJuryChairman && olympiad.status === 'completed';
+        loadParticipants(id, { allowScoreEdit: canScore, allowUpload: canUpload });
         loadJuryMembers(window.currentOlympiadId);
       } else if (actions) {
         actions.style.display = 'none';

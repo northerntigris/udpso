@@ -20,15 +20,23 @@ try {
     }
 
     $stmt = $pdo->prepare("
-        SELECT 1
+        SELECT o.status
         FROM olympiad_jury oj
         JOIN jury_members jm ON oj.jury_member_id = jm.id
+        JOIN olympiads o ON oj.olympiad_id = o.id
         WHERE oj.olympiad_id = ? AND jm.user_id = ? AND oj.jury_role = 'председатель жюри'
+        LIMIT 1
     ");
     $stmt->execute([$olympiadId, (int)$_SESSION['user_id']]);
-    if (!$stmt->fetchColumn()) {
+    $status = $stmt->fetchColumn();
+    if (!$status) {
         http_response_code(403);
         echo json_encode(['error' => 'Нет доступа к загрузке файлов'], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+    if ($status !== 'completed') {
+        http_response_code(400);
+        echo json_encode(['error' => 'Загрузка файлов доступна только после завершения олимпиады'], JSON_UNESCAPED_UNICODE);
         exit;
     }
 
