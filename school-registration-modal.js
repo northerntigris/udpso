@@ -41,17 +41,12 @@ export class SchoolRegistrationModal {
                 
                 const formData = {
                     full_name: document.getElementById('school-full-name').value,
-                    short_name: document.getElementById('school-short-name').value,
-                    inn: document.getElementById('school-inn').value,
-                    ogrn: document.getElementById('school-ogrn').value,
-                    ogrn_date: document.getElementById('school-ogrn-date').value,
                     address: document.getElementById('school-address').value,
-                    region: document.getElementById('school-region').value,
+                    ogrn: document.getElementById('school-ogrn').value,
+                    registration_date: document.getElementById('school-ogrn-date').value,
                     director_fio: document.getElementById('director-fio').value,
                     director_inn: document.getElementById('director-inn').value,
-                    director_position: document.getElementById('director-position').value,
-                    contact_phone: document.getElementById('contact-phone').value,
-                    contact_email: document.getElementById('contact-email').value
+                    director_position: document.getElementById('director-position').value
                 };
 
                 try {
@@ -66,7 +61,7 @@ export class SchoolRegistrationModal {
                     const data = await response.json();
                     
                     if (data.success) {
-                        alert('Школа зарегистрирована. Логин и пароль отправлены на указанный email.');
+                        alert('Заявка отправлена. Мы свяжемся с вами для подтверждения регистрации.');
                         this.close();
                     } else {
                         alert('Ошибка: ' + (data.error || 'Неизвестная ошибка'));
