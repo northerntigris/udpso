@@ -115,6 +115,18 @@
   cursor: pointer;
 }
 
+.score-editor,
+.upload-editor {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.score-editor .score-input {
+  width: 90px;
+}
+
 .participants-table td:last-child,
 .participants-table th:last-child {
   text-align: center;

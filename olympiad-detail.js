@@ -9,6 +9,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   const jurySection = document.getElementById('jury-block');
   let isOrganizer = false;
   const isOrganizerView = mode === 'organizer';
+  const isJuryView = mode === 'jury';
+  let juryRole = null;
+  let isJuryChairman = false;
 
   if (!id) {
     title.textContent = 'Олимпиада не найдена';
@@ -49,6 +52,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     throw new Error((data && data.error) || 'Ошибка загрузки олимпиады');
   }
 
+  async function fetchJuryRole(olympiadId) {
+    try {
+      const res = await fetch(`api/get-jury-role.php?id=${olympiadId}`);
+      const data = await res.json();
+      if (res.ok && data.success) {
+        return data.role;
+      }
+    } catch (error) {
+      console.error('Ошибка загрузки роли жюри:', error);
+    }
+    return null;
+  }
+
   try {
     const role = await fetchUserRole();
     isOrganizer = role === 'organizer';
@@ -64,6 +80,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (actions) {
           actions.classList.remove('hidden');
         }
+      } else if (isJuryView) {
+        juryRole = await fetchJuryRole(id);
+        isJuryChairman = juryRole === 'председатель жюри';
+        loadParticipants(id, { allowScoreEdit: isJuryChairman, allowUpload: isJuryChairman });
+        loadJuryMembers(window.currentOlympiadId);
       } else if (actions) {
         actions.style.display = 'none';
         const participantsTable = document.getElementById('participants-table');
@@ -511,7 +532,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 });
 
-async function loadParticipants(olympiadId) {
+async function loadParticipants(olympiadId, options = {}) {
+  const { allowScoreEdit = false, allowUpload = false } = options;
   try {
     const res = await fetch(`api/get-olympiad-participants.php?id=${olympiadId}`);
     const participants = await res.json();
@@ -534,15 +556,101 @@ async function loadParticipants(olympiadId) {
 
     participants.forEach(p => {
       const row = document.createElement('tr');
+      const scoreValue = p.score ?? '';
+      const scoreCell = allowScoreEdit
+        ? `
+          <td>
+            <div class="score-editor">
+              <input type="number" step="0.01" min="0" class="score-input" value="${scoreValue}">
+              <button type="button" class="btn-action btn-save-score">Сохранить</button>
+            </div>
+          </td>
+        `
+        : `<td>${p.score ?? '—'}</td>`;
+
+      const fileCell = allowUpload
+        ? `
+          <td>
+            ${p.work_file_id ? `<a href="get-file.php?id=${p.work_file_id}" target="_blank">Открыть</a>` : '—'}
+            <div class="upload-editor">
+              <input type="file" class="work-file-input" accept="application/pdf,image/*">
+              <button type="button" class="btn-action btn-upload-work">Загрузить</button>
+            </div>
+          </td>
+        `
+        : `
+          <td>
+            ${p.work_file_id ? `<a href="get-file.php?id=${p.work_file_id}" target="_blank">Открыть</a>` : '—'}
+          </td>
+        `;
+
       row.innerHTML = `
         <td>${p.full_name}</td>
         <td>${p.grade}</td>
-        <td>${p.score ?? '—'}</td>
-        <td>
-          ${p.work_file_id ? `<a href="get-file.php?id=${p.work_file_id}" target="_blank">Открыть</a>` : '—'}
-        </td>
+        ${scoreCell}
+        ${fileCell}
       `;
       row.addEventListener('click', () => openParticipantModal(p));
+
+      if (allowScoreEdit) {
+        const saveBtn = row.querySelector('.btn-save-score');
+        const scoreInput = row.querySelector('.score-input');
+        scoreInput?.addEventListener('click', event => event.stopPropagation());
+        saveBtn?.addEventListener('click', async (event) => {
+          event.stopPropagation();
+          const value = scoreInput?.value;
+          try {
+            const res = await fetch('api/update-participant-score.php', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                olympiad_id: olympiadId,
+                student_id: p.id,
+                score: value
+              })
+            });
+            const data = await res.json();
+            if (!res.ok || data.error) {
+              throw new Error(data.error || 'Ошибка сохранения баллов');
+            }
+          } catch (error) {
+            console.error('Ошибка сохранения баллов:', error);
+            alert('Не удалось сохранить баллы.');
+          }
+        });
+      }
+
+      if (allowUpload) {
+        const uploadBtn = row.querySelector('.btn-upload-work');
+        const fileInput = row.querySelector('.work-file-input');
+        fileInput?.addEventListener('click', event => event.stopPropagation());
+        uploadBtn?.addEventListener('click', async (event) => {
+          event.stopPropagation();
+          if (!fileInput?.files?.length) {
+            alert('Выберите файл для загрузки.');
+            return;
+          }
+          const formData = new FormData();
+          formData.append('olympiad_id', olympiadId);
+          formData.append('student_id', p.id);
+          formData.append('work_file', fileInput.files[0]);
+          try {
+            const res = await fetch('api/upload-participant-work.php', {
+              method: 'POST',
+              body: formData
+            });
+            const data = await res.json();
+            if (!res.ok || data.error) {
+              throw new Error(data.error || 'Ошибка загрузки файла');
+            }
+            loadParticipants(olympiadId, options);
+          } catch (error) {
+            console.error('Ошибка загрузки файла:', error);
+            alert('Не удалось загрузить файл.');
+          }
+        });
+      }
+
       tbody.appendChild(row);
     });
   } catch (err) {
