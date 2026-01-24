@@ -1,39 +1,121 @@
 document.addEventListener('DOMContentLoaded', async () => {
   const params = new URLSearchParams(window.location.search);
   const id = params.get('id');
+  const mode = params.get('mode');
   const title = document.getElementById('olympiad-title');
   const editBtn = document.getElementById('edit-info-btn');
+  const actions = document.getElementById('actions');
+  const participantsSection = document.getElementById('participants-table')?.closest('.olympiad-section');
+  const jurySection = document.getElementById('jury-block');
+  let isOrganizer = false;
+  const isOrganizerView = mode === 'organizer';
+  const isJuryView = mode === 'jury';
+  let juryRole = null;
+  let isJuryChairman = false;
 
   if (!id) {
     title.textContent = 'Олимпиада не найдена';
-    document.getElementById('actions').style.display = 'none';
+    if (actions) {
+      actions.style.display = 'none';
+    }
     return;
   }
 
+  async function fetchUserRole() {
+    try {
+      const res = await fetch('check-auth.php');
+      const data = await res.json();
+      if (res.ok && data.success) {
+        return data.user_role || null;
+      }
+    } catch (error) {
+      console.error('Ошибка проверки авторизации:', error);
+    }
+    return null;
+  }
+
+  async function fetchOlympiadDetails(olympiadId) {
+    const res = await fetch(`api/get-olympiad.php?id=${olympiadId}`);
+    const data = await res.json();
+    if (res.ok && data && !data.error) {
+      return data;
+    }
+
+    if (data && data.error === 'Unauthorized') {
+      const publicRes = await fetch(`api/get-public-olympiad.php?id=${olympiadId}`);
+      const publicData = await publicRes.json();
+      if (publicRes.ok && publicData && !publicData.error) {
+        return publicData;
+      }
+    }
+
+    throw new Error((data && data.error) || 'Ошибка загрузки олимпиады');
+  }
+
+  async function fetchJuryRole(olympiadId) {
+    try {
+      const res = await fetch(`api/get-jury-role.php?id=${olympiadId}`);
+      const data = await res.json();
+      if (res.ok && data.success) {
+        return data.role;
+      }
+    } catch (error) {
+      console.error('Ошибка загрузки роли жюри:', error);
+    }
+    return null;
+  }
+
   try {
-    const res = await fetch(`api/get-olympiad.php?id=${id}`);
-    const olympiad = await res.json();
+    const role = await fetchUserRole();
+    isOrganizer = role === 'organizer';
+    const olympiad = await fetchOlympiadDetails(id);
 
     if (olympiad && olympiad.title) {
-      loadParticipants(id);
+      window.currentOlympiad = olympiad;
       window.currentOlympiadId = olympiad.id;
 
-      loadJuryMembers(window.currentOlympiadId);
+      if (isOrganizer && isOrganizerView) {
+        loadParticipants(id);
+        loadJuryMembers(window.currentOlympiadId);
+        if (actions) {
+          actions.classList.remove('hidden');
+        }
+      } else if (isJuryView) {
+        juryRole = await fetchJuryRole(id);
+        isJuryChairman = juryRole === 'председатель жюри';
+        const canScore = isJuryChairman && olympiad.status === 'completed';
+        const canUpload = isJuryChairman && olympiad.status === 'completed';
+        loadParticipants(id, { allowScoreEdit: canScore, allowUpload: canUpload });
+        loadJuryMembers(window.currentOlympiadId);
+      } else if (actions) {
+        actions.style.display = 'none';
+        const participantsTable = document.getElementById('participants-table');
+        if (participantsTable) {
+          participantsTable.classList.add('public-view');
+        }
+      }
       title.textContent = `${olympiad.title} — ${olympiad.subject}`;
       window.currentOlympiadStatus = olympiad.status;
 
       // Скрыть кнопку редактирования, если статус не "ожидается"
-      if (olympiad.status !== 'upcoming') {
+      if (olympiad.status !== 'upcoming' || !isOrganizer || !isOrganizerView) {
         editBtn.style.display = 'none';
       }
 
       const infoBlock = document.getElementById('info-placeholder');
       const format = date => new Date(date).toLocaleString();
+      const formatInputDate = date => {
+        const value = new Date(date);
+        if (Number.isNaN(value.getTime())) return '';
+        const pad = num => String(num).padStart(2, '0');
+        return `${value.getFullYear()}-${pad(value.getMonth() + 1)}-${pad(value.getDate())}T${pad(value.getHours())}:${pad(value.getMinutes())}`;
+      };
       const statusText = s => {
         switch (s) {
           case 'upcoming': return 'Ожидается';
           case 'ongoing': return 'В процессе';
           case 'completed': return 'Завершена';
+          case 'archived': return 'Архив';
           case 'cancelled': return 'Отменена';
           default: return 'Неизвестно';
         }
@@ -47,13 +129,96 @@ document.addEventListener('DOMContentLoaded', async () => {
         <p><strong>Описание:</strong><br>${olympiad.description || '—'}</p>
       `;
 
+      editBtn?.addEventListener('click', () => {
+        if (!isOrganizer || !isOrganizerView) {
+          return;
+        }
+
+        const current = window.currentOlympiad;
+        if (!current) return;
+
+        infoBlock.innerHTML = `
+          <form id="edit-olympiad-form" class="modal-body">
+            <label>Название
+              <input type="text" name="title" value="${current.title}" required>
+            </label>
+            <label>Предмет
+              <input type="text" name="subject" value="${current.subject}" required>
+            </label>
+            <label>Дата и время
+              <input type="datetime-local" name="datetime" value="${formatInputDate(current.datetime)}" required>
+            </label>
+            <label>Классы
+              <input type="text" name="grades" value="${current.grades}" required>
+            </label>
+            <label>Описание
+              <textarea name="description" rows="4">${current.description || ''}</textarea>
+            </label>
+            <div class="modal-footer">
+              <button type="submit" class="btn-submit">Сохранить</button>
+              <button type="button" class="btn-action" id="cancel-edit-olympiad">Отмена</button>
+            </div>
+          </form>
+        `;
+
+        document.getElementById('cancel-edit-olympiad')?.addEventListener('click', () => {
+          infoBlock.innerHTML = `
+            <p><strong>Предмет:</strong> ${current.subject}</p>
+            <p><strong>Дата и время:</strong> ${format(current.datetime)}</p>
+            <p><strong>Классы:</strong> ${current.grades}</p>
+            <p><strong>Статус:</strong> ${statusText(current.status)}</p>
+            <p><strong>Описание:</strong><br>${current.description || '—'}</p>
+          `;
+        });
+
+        document.getElementById('edit-olympiad-form')?.addEventListener('submit', async (event) => {
+          event.preventDefault();
+          const form = event.target;
+          if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+          }
+          const formData = new FormData(form);
+          const payload = Object.fromEntries(formData.entries());
+          payload.id = window.currentOlympiadId;
+
+          try {
+            const res = await fetch('api/update-olympiad.php', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (!res.ok || data.error) {
+              throw new Error(data.error || 'Ошибка сохранения');
+            }
+
+            window.currentOlympiad = { ...current, ...payload };
+            title.textContent = `${payload.title} — ${payload.subject}`;
+            infoBlock.innerHTML = `
+              <p><strong>Предмет:</strong> ${payload.subject}</p>
+              <p><strong>Дата и время:</strong> ${format(payload.datetime)}</p>
+              <p><strong>Классы:</strong> ${payload.grades}</p>
+              <p><strong>Статус:</strong> ${statusText(current.status)}</p>
+              <p><strong>Описание:</strong><br>${payload.description || '—'}</p>
+            `;
+          } catch (err) {
+            console.error('Ошибка сохранения олимпиады:', err);
+            alert('Не удалось сохранить изменения.');
+          }
+        });
+      });
     } else {
       title.textContent = 'Олимпиада не найдена';
-      document.getElementById('actions').style.display = 'none';
+      if (actions) actions.style.display = 'none';
     }
+
   } catch (error) {
     console.error('Ошибка загрузки олимпиады:', error);
-    title.textContent = 'Ошибка загрузки олимпиады';
+    title.textContent = 'Олимпиада не найдена';
+    if (actions) {
+      actions.style.display = 'none';
+    }
   }
 
   document.getElementById('close-jury-modal').addEventListener('click', () => {
@@ -104,7 +269,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         form.reset();
         document.getElementById('add-student-modal').classList.remove('open');
         document.body.classList.remove('no-scroll');
-        // В будущем: обновить список участников
+        if (window.currentOlympiadId) {
+          loadParticipants(window.currentOlympiadId);
+        }
       } else {
         alert('Ошибка: ' + (result.error || 'Не удалось добавить участника'));
       }
@@ -368,10 +535,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 });
 
-async function loadParticipants(olympiadId) {
+async function loadParticipants(olympiadId, options = {}) {
+  const { allowScoreEdit = false, allowUpload = false } = options;
   try {
     const res = await fetch(`api/get-olympiad-participants.php?id=${olympiadId}`);
     const participants = await res.json();
+    if (!res.ok || participants.error) {
+      throw new Error(participants.error || 'Ошибка загрузки участников');
+    }
     const table = document.getElementById('participants-table');
     const placeholder = document.getElementById('participants-placeholder');
     const tbody = table.querySelector('tbody');
@@ -388,15 +559,101 @@ async function loadParticipants(olympiadId) {
 
     participants.forEach(p => {
       const row = document.createElement('tr');
+      const scoreValue = p.score ?? '';
+      const scoreCell = allowScoreEdit
+        ? `
+          <td>
+            <div class="score-editor">
+              <input type="number" step="0.01" min="0" class="score-input" value="${scoreValue}">
+              <button type="button" class="btn-action btn-save-score">Сохранить</button>
+            </div>
+          </td>
+        `
+        : `<td>${p.score ?? '—'}</td>`;
+
+      const fileCell = allowUpload
+        ? `
+          <td>
+            ${p.work_file_id ? `<a href="get-file.php?id=${p.work_file_id}" target="_blank">Открыть</a>` : '—'}
+            <div class="upload-editor">
+              <input type="file" class="work-file-input" accept="application/pdf,image/*">
+              <button type="button" class="btn-action btn-upload-work">Загрузить</button>
+            </div>
+          </td>
+        `
+        : `
+          <td>
+            ${p.work_file_id ? `<a href="get-file.php?id=${p.work_file_id}" target="_blank">Открыть</a>` : '—'}
+          </td>
+        `;
+
       row.innerHTML = `
         <td>${p.full_name}</td>
         <td>${p.grade}</td>
-        <td>${p.score ?? '—'}</td>
-        <td>
-          ${p.work_file_id ? `<a href="get-file.php?id=${p.work_file_id}" target="_blank">Открыть</a>` : '—'}
-        </td>
+        ${scoreCell}
+        ${fileCell}
       `;
       row.addEventListener('click', () => openParticipantModal(p));
+
+      if (allowScoreEdit) {
+        const saveBtn = row.querySelector('.btn-save-score');
+        const scoreInput = row.querySelector('.score-input');
+        scoreInput?.addEventListener('click', event => event.stopPropagation());
+        saveBtn?.addEventListener('click', async (event) => {
+          event.stopPropagation();
+          const value = scoreInput?.value;
+          try {
+            const res = await fetch('api/update-participant-score.php', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                olympiad_id: olympiadId,
+                student_id: p.id,
+                score: value
+              })
+            });
+            const data = await res.json();
+            if (!res.ok || data.error) {
+              throw new Error(data.error || 'Ошибка сохранения баллов');
+            }
+          } catch (error) {
+            console.error('Ошибка сохранения баллов:', error);
+            alert('Не удалось сохранить баллы.');
+          }
+        });
+      }
+
+      if (allowUpload) {
+        const uploadBtn = row.querySelector('.btn-upload-work');
+        const fileInput = row.querySelector('.work-file-input');
+        fileInput?.addEventListener('click', event => event.stopPropagation());
+        uploadBtn?.addEventListener('click', async (event) => {
+          event.stopPropagation();
+          if (!fileInput?.files?.length) {
+            alert('Выберите файл для загрузки.');
+            return;
+          }
+          const formData = new FormData();
+          formData.append('olympiad_id', olympiadId);
+          formData.append('student_id', p.id);
+          formData.append('work_file', fileInput.files[0]);
+          try {
+            const res = await fetch('api/upload-participant-work.php', {
+              method: 'POST',
+              body: formData
+            });
+            const data = await res.json();
+            if (!res.ok || data.error) {
+              throw new Error(data.error || 'Ошибка загрузки файла');
+            }
+            loadParticipants(olympiadId, options);
+          } catch (error) {
+            console.error('Ошибка загрузки файла:', error);
+            alert('Не удалось загрузить файл.');
+          }
+        });
+      }
+
       tbody.appendChild(row);
     });
   } catch (err) {

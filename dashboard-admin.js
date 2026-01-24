@@ -12,6 +12,11 @@ export class DashboardAdmin {
 
     static checkAuth() {
         const userRole = localStorage.getItem('userRole');
+        if (userRole === 'expert') {
+            window.location.href = 'dashboard-jury.html';
+            return;
+        }
+
         if (userRole !== 'admin') {
             window.location.href = 'index.html';
         }

@@ -107,6 +107,7 @@
 .status-upcoming   { background: #d6eaf8; color: #21618c; }
 .status-ongoing    { background: #fdebd0; color: #a04000; }
 .status-completed  { background: #d5f5e3; color: #1e8449; }
+.status-archived   { background: #eceff1; color: #546e7a; }
 .status-cancelled  { background: #f5b7b1; color: #943126; }
 
 .filter-card {

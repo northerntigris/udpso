@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Панель жюри</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body data-page="dashboard">
+  <div class="container">
+    <main class="main-content" id="main-content">
+      <div class="content-header">
+        <button class="mobile-toggle-btn" id="mobile-toggle-btn">
+          <i class="fas fa-bars"></i>
+          <span>Меню</span>
+        </button>
+        <h1 class="page-title">Панель жюри</h1>
+      </div>
+
+      <div class="dashboard-content">
+        <section class="dashboard-section">
+          <h2 class="card-title">Мои олимпиады</h2>
+          <ul id="jury-olympiads-list" class="olympiads-list">
+            <div class="loader"></div>
+          </ul>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script type="module" src="main.js"></script>
+  <script type="module" src="dashboard-jury.js"></script>
+</body>
+</html>

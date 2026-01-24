@@ -94,7 +94,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       `;
       item.addEventListener('click', () => {
-        window.location.href = `olympiad-detail.html?id=${o.id}`;
+        window.location.href = `olympiad-detail.html?id=${o.id}&mode=organizer`;
       });
       list.appendChild(item);
     });
@@ -121,6 +121,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       case 'upcoming': return 'Ожидается';
       case 'ongoing': return 'В процессе';
       case 'completed': return 'Завершена';
+      case 'archived': return 'Архив';
       case 'cancelled': return 'Отменена';
       default: return 'Неизвестно';
     }
