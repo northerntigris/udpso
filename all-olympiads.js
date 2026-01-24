@@ -94,7 +94,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       `;
       item.addEventListener('click', () => {
-        window.location.href = `olympiad-detail.html?id=${o.id}`;
+        window.location.href = `olympiad-detail.html?id=${o.id}&mode=organizer`;
       });
       list.appendChild(item);
     });

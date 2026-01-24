@@ -40,10 +40,54 @@ try {
     $juryRole   = trim((string)($data['jury_role'] ?? 'Эксперт'));
 
     // Валидация
-    if ($fullName === '' || $username === '' || $password === '') {
+    if (
+        $fullName === '' ||
+        $email === '' ||
+        $snils === '' ||
+        $organization === '' ||
+        $passportSeries === '' ||
+        $passportNumber === '' ||
+        $passportIssuedBy === '' ||
+        $passportIssuedDate === '' ||
+        $birthdate === '' ||
+        $juryRole === ''
+    ) {
         http_response_code(400);
         echo json_encode(['success' => false, 'error' => 'Заполните обязательные поля'], JSON_UNESCAPED_UNICODE);
         exit;
+    }
+
+    if ($olympiadId === null || $olympiadId <= 0) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'error' => 'Не указана олимпиада'], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'error' => 'Некорректный email'], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    $snilsDigits = preg_replace('/\\D+/', '', $snils);
+    if (strlen($snilsDigits) !== 11) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'error' => 'СНИЛС должен содержать 11 цифр'], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    if (!preg_match('/^\\d{4}$/', $passportSeries) || !preg_match('/^\\d{6}$/', $passportNumber)) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'error' => 'Паспорт должен содержать серию из 4 цифр и номер из 6 цифр'], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    if ($username === '') {
+        $username = 'expert_' . time() . '_' . random_int(1000, 9999);
+    }
+
+    if ($password === '') {
+        $password = bin2hex(random_bytes(4));
     }
 
     $passwordHash = password_hash($password, PASSWORD_DEFAULT);
@@ -60,8 +104,8 @@ try {
         ':username'  => $username,
         ':password'  => $passwordHash,
         ':full_name' => $fullName,
-        ':email'     => ($email !== '' ? $email : null),
-        ':snils'     => ($snils !== '' ? $snils : null),
+        ':email'     => $email,
+        ':snils'     => $snilsDigits,
     ]);
 
     $userId = (int)$stmtUser->fetchColumn();
@@ -85,12 +129,12 @@ try {
 
     $stmtJury->execute([
         ':user_id'             => $userId,
-        ':organization'        => ($organization !== '' ? $organization : null),
-        ':passport_series'     => ($passportSeries !== '' ? $passportSeries : null),
-        ':passport_number'     => ($passportNumber !== '' ? $passportNumber : null),
-        ':passport_issued_by'  => ($passportIssuedBy !== '' ? $passportIssuedBy : null),
-        ':passport_issued_date'=> ($passportIssuedDate !== '' ? $passportIssuedDate : null),
-        ':birthdate'           => ($birthdate !== '' ? $birthdate : null),
+        ':organization'        => $organization,
+        ':passport_series'     => $passportSeries,
+        ':passport_number'     => $passportNumber,
+        ':passport_issued_by'  => $passportIssuedBy,
+        ':passport_issued_date'=> $passportIssuedDate,
+        ':birthdate'           => $birthdate,
     ]);
 
     $juryMemberId = (int)$stmtJury->fetchColumn();
@@ -115,7 +159,9 @@ try {
     echo json_encode([
         'success'        => true,
         'user_id'        => $userId,
-        'jury_member_id' => $juryMemberId
+        'jury_member_id' => $juryMemberId,
+        'login'          => $username,
+        'password'       => $password
     ], JSON_UNESCAPED_UNICODE);
 
 } catch (Throwable $e) {
