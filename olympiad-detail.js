@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const isJuryView = mode === 'jury';
   let juryRole = null;
   let isJuryChairman = false;
+  window.currentOlympiadView = { isOrganizerView, isJuryView };
 
   if (!id) {
     title.textContent = 'Олимпиада не найдена';
@@ -86,7 +87,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         const canScore = isJuryChairman && olympiad.status === 'completed';
         const canUpload = isJuryChairman && olympiad.status === 'completed';
         loadParticipants(id, { allowScoreEdit: canScore, allowUpload: canUpload });
-        loadJuryMembers(window.currentOlympiadId);
+        if (jurySection) {
+          jurySection.style.display = 'none';
+        }
       } else if (actions) {
         actions.style.display = 'none';
         const participantsTable = document.getElementById('participants-table');
@@ -680,11 +683,19 @@ function openParticipantModal(p) {
     <p><strong>Email:</strong> ${p.email ?? '—'}</p>
   `;
 
-  // Назначаем обработчик редактирования
   const editBtn = document.getElementById('edit-participant-btn');
-  editBtn.onclick = () => {
-    openEditParticipantForm(p);
-  };
+  const isOrganizerView = window.currentOlympiadView?.isOrganizerView;
+  if (editBtn) {
+    if (isOrganizerView) {
+      editBtn.style.display = '';
+      editBtn.onclick = () => {
+        openEditParticipantForm(p);
+      };
+    } else {
+      editBtn.style.display = 'none';
+      editBtn.onclick = null;
+    }
+  }
 
   modal.classList.add('open');
   document.body.classList.add('no-scroll');
