@@ -83,7 +83,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       } else if (isJuryView) {
         juryRole = await fetchJuryRole(id);
         isJuryChairman = juryRole === 'председатель жюри';
-        loadParticipants(id, { allowScoreEdit: isJuryChairman, allowUpload: isJuryChairman });
+        const canScore = isJuryChairman && olympiad.status === 'completed';
+        loadParticipants(id, { allowScoreEdit: canScore, allowUpload: isJuryChairman });
         loadJuryMembers(window.currentOlympiadId);
       } else if (actions) {
         actions.style.display = 'none';
@@ -113,6 +114,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           case 'upcoming': return 'Ожидается';
           case 'ongoing': return 'В процессе';
           case 'completed': return 'Завершена';
+          case 'archived': return 'Архив';
           case 'cancelled': return 'Отменена';
           default: return 'Неизвестно';
         }
