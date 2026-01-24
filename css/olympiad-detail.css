@@ -60,6 +60,10 @@
     margin: 0;
     width: auto;
 }
+
+.checkbox-field label {
+    margin: 0;
+}
     
 .olympiad-section {
     margin-top: 24px;

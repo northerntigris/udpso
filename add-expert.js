@@ -75,7 +75,15 @@ document.addEventListener('DOMContentLoaded', () => {
         body: formData
       });
 
-      const data = await res.json();
+      const text = await res.text();
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (parseError) {
+        console.error('Некорректный JSON от сервера:', text);
+        alert('Ошибка сервера. Попробуйте позже.');
+        return;
+      }
 
       if (data.success) {
         alert(`Эксперт добавлен. Логин: ${data.login}, Пароль: ${data.password}`);
