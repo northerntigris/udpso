@@ -28,9 +28,10 @@ export class DashboardAdmin {
             const data = await response.json();
             
             if (data.success) {
-                document.getElementById('total-schools').textContent = data.total_schools;
                 document.getElementById('pending-applications').textContent = data.pending_applications;
                 document.getElementById('total-users').textContent = data.total_users;
+                document.getElementById('admin-total-schools').textContent = data.total_schools;
+
             }
         } catch (error) {
             console.error('Ошибка загрузки статистики:', error);

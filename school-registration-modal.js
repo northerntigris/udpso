@@ -55,7 +55,7 @@ export class SchoolRegistrationModal {
                 };
 
                 try {
-                    const response = await fetch('register-school.php', {
+                    const response = await fetch('api/register-school-by-organizer.php', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -66,7 +66,7 @@ export class SchoolRegistrationModal {
                     const data = await response.json();
                     
                     if (data.success) {
-                        alert('Заявка успешно отправлена! Мы свяжемся с вами в ближайшее время.');
+                        alert('Школа зарегистрирована. Логин и пароль отправлены на указанный email.');
                         this.close();
                     } else {
                         alert('Ошибка: ' + (data.error || 'Неизвестная ошибка'));

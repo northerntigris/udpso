@@ -1,6 +1,5 @@
 <?php
 // api/get-student-olympiads.php
-
 require_once __DIR__ . '/../config.php';
 header('Content-Type: application/json; charset=utf-8');
 session_start();
@@ -14,15 +13,31 @@ try {
 
     $studentId = (int)$_SESSION['user_id'];
 
-    /*
-      Логика запроса:
-      - берём все олимпиады, где studentId есть в olympiad_participants
-      - добавляем score
-      - (опционально) подтягиваем id файлов заданий и работы, если такие таблицы есть:
-        - olympiad_task_files (по olympiad_id)
-        - participant_work_files (по olympiad_id + student_id)
-      Если у тебя таблицы/поля называются чуть иначе — скажи, я подгоню.
-    */
+    // имя ученика
+    $nameStmt = $pdo->prepare("SELECT full_name FROM users WHERE id = ? LIMIT 1");
+    $nameStmt->execute([$studentId]);
+    $studentName = $nameStmt->fetchColumn() ?: '';
+
+    // Проверяем наличие таблиц файлов (чтобы не падать на LEFT JOIN)
+    $hasTaskFiles = (bool)$pdo->query("
+        SELECT 1 FROM information_schema.tables
+        WHERE table_schema='public' AND table_name='olympiad_task_files'
+        LIMIT 1
+    ")->fetchColumn();
+
+    $hasWorkFiles = (bool)$pdo->query("
+        SELECT 1 FROM information_schema.tables
+        WHERE table_schema='public' AND table_name='participant_work_files'
+        LIMIT 1
+    ")->fetchColumn();
+
+    $taskFileSelect = $hasTaskFiles
+        ? "(SELECT id FROM olympiad_task_files WHERE olympiad_id = o.id ORDER BY id DESC LIMIT 1) AS task_file_id"
+        : "NULL AS task_file_id";
+
+    $workFileSelect = $hasWorkFiles
+        ? "(SELECT id FROM participant_work_files WHERE olympiad_id = o.id AND student_id = op.student_id ORDER BY id DESC LIMIT 1) AS work_file_id"
+        : "NULL AS work_file_id";
 
     $sql = "
         SELECT
@@ -30,39 +45,30 @@ try {
             o.title,
             o.subject,
             o.datetime,
-            o.grades,
             o.status,
-            o.description,
             op.score,
 
-            -- файл заданий (если есть таблица)
-            tf.id  AS task_file_id,
+            CASE
+              WHEN op.score IS NULL THEN NULL
+              ELSE RANK() OVER (PARTITION BY op.olympiad_id ORDER BY op.score DESC NULLS LAST)
+            END AS place,
 
-            -- файл работы участника (если есть таблица)
-            wf.id  AS work_file_id
+            $taskFileSelect,
+            $workFileSelect
 
         FROM olympiad_participants op
-        JOIN olympiads o
-          ON o.id = op.olympiad_id
-
-        LEFT JOIN olympiad_task_files tf
-          ON tf.olympiad_id = o.id
-
-        LEFT JOIN participant_work_files wf
-          ON wf.olympiad_id = o.id
-         AND wf.student_id  = op.student_id
-
+        JOIN olympiads o ON o.id = op.olympiad_id
         WHERE op.student_id = :student_id
         ORDER BY o.datetime DESC
     ";
 
     $stmt = $pdo->prepare($sql);
     $stmt->execute([':student_id' => $studentId]);
-
     $olympiads = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     echo json_encode([
         'success' => true,
+        'name' => $studentName,
         'olympiads' => $olympiads
     ], JSON_UNESCAPED_UNICODE);
 
@@ -74,5 +80,4 @@ try {
         // 'details' => $e->getMessage()
     ], JSON_UNESCAPED_UNICODE);
 }
-
 ?>

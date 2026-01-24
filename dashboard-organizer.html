@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="css/main.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
-<body data-page="organizer-dashboard">
+<body data-page="dashboard">
   <div class="container">
     <main class="main-content" id="main-content">
       <div class="content-header">
@@ -28,13 +28,15 @@
                 <div class="stat-value" id="active-count">0</div>
                 <div class="stat-label">Активные олимпиады</div>
               </div>
+
               <div class="stat-item">
                 <div class="stat-value" id="completed-count">0</div>
                 <div class="stat-label">Завершённые олимпиады</div>
               </div>
+
               <div class="stat-item">
-                <div class="stat-value" id="students-count">0</div>
-                <div class="stat-label">Ученики школы</div>
+                <div class="stat-value" id="my-schools-count">0</div>
+                <div class="stat-label">Зарегистрированные образовательные учреждения</div>
               </div>
             </div>
           </div>
@@ -42,6 +44,14 @@
           <div class="card quick-actions">
             <h2 class="card-title">Быстрые действия</h2>
             <div class="actions-grid">
+              <button class="action-btn" id="add-school">
+                <i class="fas fa-school"></i>
+                <span>Регистрация образовательного учреждения</span>
+              </button>
+              <button class="action-btn" id="view-schools">
+                <i class="fas fa-building"></i>
+                <span>Просмотр образовательных учреждений</span>
+              </button>
               <button class="action-btn" id="create-olympiad">
                   <i class="fas fa-plus"></i>
                   <span>Добавить олимпиаду</span>
@@ -101,6 +111,33 @@
       </form>
     </div>
   </div>
+
+  <!-- Модальное окно просмотра зарегистрированных образовательных учреждений -->
+  <div class="modal" id="schools-modal">
+    <div class="modal-content" style="max-width: 1000px;">
+      <div class="modal-header">
+        <h3>Зарегистрированные образовательные учреждения</h3>
+        <button id="schools-modal-close" class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="overflow:auto;">
+          <table class="participants-table">
+            <thead>
+              <tr>
+                <th>Наименование</th>
+                <th>Регион</th>
+                <th>Email</th>
+                <th>Логин</th>
+                <th>Дата регистрации</th>
+              </tr>
+            </thead>
+            <tbody id="schools-modal-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
 
   <script type="module" src="main.js"></script>
   <script type="module" src="dashboard-organizer.js"></script>

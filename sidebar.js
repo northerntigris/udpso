@@ -12,17 +12,14 @@ export class SidebarLoader {
             const sidebarContainer = document.createElement('div');
             sidebarContainer.innerHTML = sidebarHtml;
             document.querySelector('.container').prepend(sidebarContainer.firstElementChild);
-            
-            // Помечаем активную страницу
-            if (currentPage) {
-                const activeItem = document.querySelector(`.nav-menu li[data-page="${currentPage}"]`);
-                if (activeItem) {
-                    activeItem.classList.add('active');
-                }
-            }
-            
-            // Инициализируем обработчики событий
+
             this.initSidebarEvents();
+
+            // Помечаем активную страницу ПОСЛЕ того, как user-menu заполнился
+            if (currentPage) {
+                this.setActiveItem(currentPage);
+            }
+
             
         } catch (error) {
             console.error('Ошибка загрузки сайдбара:', error);
@@ -38,7 +35,6 @@ export class SidebarLoader {
         
         // Проверяем состояние сайдбара в localStorage
         const isSidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
-        
         
         if (isSidebarCollapsed) {
             sidebar.classList.add('collapsed');
@@ -57,31 +53,40 @@ export class SidebarLoader {
 
         const logoutBtn = document.getElementById('logout-btn');
         if (logoutBtn) {
-            logoutBtn.addEventListener('click', function() {
-                fetch('logout.php')
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success && data.clearLocalStorage) {
-                            localStorage.removeItem('userRole');
-                            AuthModal.updateAuthUI(false);
-                            SidebarLoader.updateUserMenu(); // Обновляем меню
+            logoutBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
 
-                            // Показываем кнопку регистрации школы после выхода
-                            const registerBtn = document.getElementById('register-school-btn');
-                            if (registerBtn) {
-                                registerBtn.style.display = 'flex';
-                                // Также показываем тултип
-                                const tooltip = document.querySelector('.register-tooltip');
-                                if (tooltip) tooltip.style.display = 'inline-block';
-                            }
-                            
-                            window.location.href = 'index.html';
-                            location.reload();
-                        }
-                    })
-                    .catch(error => console.error('Ошибка при выходе:', error));
+                // 1) Попытка завершить сессию на сервере (даже если не получится — всё равно выходим)
+                try {
+                    await fetch('logout.php', { method: 'POST' });
+                } catch (error) {
+                    console.error('Ошибка при выходе (server):', error);
+                }
+
+                // 2) Чистим локальные данные авторизации
+                localStorage.removeItem('isAuthenticated');
+                localStorage.removeItem('userRole');
+                localStorage.removeItem('userId');
+                localStorage.removeItem('username');
+                localStorage.removeItem('redirectAfterLogin');
+                sessionStorage.clear();
+
+                AuthModal.updateAuthUI(false);
+                SidebarLoader.updateUserMenu(); // Обновляем меню
+
+                // 3) Показать кнопку регистрации школы (как было у тебя)
+                const registerBtn = document.getElementById('register-school-btn');
+                if (registerBtn) {
+                    registerBtn.style.display = 'flex';
+                    const tooltip = document.querySelector('.register-tooltip');
+                    if (tooltip) tooltip.style.display = 'inline-block';
+                }
+
+                // 4) ВСЕГДА редирект на главную
+                window.location.href = 'index.html';
             });
         }
+
             
         // Обработчик кнопки сворачивания/разворачивания
         if (toggleBtn) {
@@ -165,10 +170,13 @@ export class SidebarLoader {
     }
 
     static setActiveItem(currentPage) {
-        const activeItem = document.querySelector(`.nav-menu li[data-page="${currentPage}"]`);
-        if (activeItem) {
-            activeItem.classList.add('active');
-        }
+        // убрать предыдущую подсветку
+        document.querySelectorAll('.nav-menu li.active').forEach(li => li.classList.remove('active'));
+
+        // подсветить все подходящие пункты (включая user-menu)
+        document.querySelectorAll(`.nav-menu li[data-page="${currentPage}"]`)
+            .forEach(li => li.classList.add('active'));
     }
+
 
 }

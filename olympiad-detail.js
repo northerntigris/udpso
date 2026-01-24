@@ -14,6 +14,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   let isJuryChairman = false;
   window.currentOlympiadView = { isOrganizerView, isJuryView };
 
+  if(isJuryView) {
+    document.body.classList.add('jury-view');
+  }
+
   if (!id) {
     title.textContent = 'Олимпиада не найдена';
     if (actions) {

@@ -115,6 +115,11 @@
   cursor: pointer;
 }
 
+body.jury-view .participants-table tr:hover {
+  background-color: inherit;
+  cursor: default;
+}
+
 .score-editor,
 .upload-editor {
   display: flex;
