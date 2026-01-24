@@ -20,6 +20,7 @@ try {
     $fullName = trim((string)($data['full_name'] ?? ''));
     $age      = isset($data['age']) ? (int)$data['age'] : null;
     $grade    = isset($data['grade']) ? (int)$data['grade'] : null;
+    $olympiadId = isset($data['olympiad_id']) ? (int)$data['olympiad_id'] : null;
 
     $snils    = trim((string)($data['snils'] ?? ''));
     $email    = trim((string)($data['email'] ?? ''));
@@ -30,17 +31,37 @@ try {
     // Школа обычно берётся от организатора (как у тебя по проекту)
     $schoolId = isset($_SESSION['school_id']) ? (int)$_SESSION['school_id'] : null;
     if ($schoolId === null || $schoolId <= 0) {
-        // Если у тебя в сессии школа хранится иначе — скажи, подстрою
+        $stmt = $pdo->prepare("SELECT school_id FROM users WHERE id = ?");
+        $stmt->execute([$_SESSION['user_id']]);
+        $schoolId = (int)$stmt->fetchColumn();
+    }
+
+    if ($schoolId <= 0) {
         http_response_code(400);
         echo json_encode(['success' => false, 'error' => 'Не определена школа организатора'], JSON_UNESCAPED_UNICODE);
         exit;
     }
 
     // Валидация
-    if ($fullName === '' || $username === '' || $password === '' || $grade === null) {
+    if ($fullName === '' || $grade === null || $age === null || !$olympiadId) {
         http_response_code(400);
         echo json_encode(['success' => false, 'error' => 'Заполните обязательные поля'], JSON_UNESCAPED_UNICODE);
         exit;
+    }
+
+    $snilsDigits = preg_replace('/\\D+/', '', $snils);
+    if ($snilsDigits !== '' && strlen($snilsDigits) !== 11) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'error' => 'СНИЛС должен содержать 11 цифр'], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    if ($username === '') {
+        $username = 'student_' . time() . '_' . random_int(1000, 9999);
+    }
+
+    if ($password === '') {
+        $password = bin2hex(random_bytes(4));
     }
 
     // Хеш пароля
@@ -61,12 +82,45 @@ try {
         ':full_name' => $fullName,
         ':age'       => $age,
         ':grade'     => $grade,
-        ':snils'     => ($snils !== '' ? $snils : null),
+        ':snils'     => ($snilsDigits !== '' ? $snilsDigits : null),
         ':email'     => ($email !== '' ? $email : null),
         ':school_id' => $schoolId
     ]);
 
     $studentId = (int)$stmt->fetchColumn();
+
+    $hasSchoolColumn = false;
+    $columnStmt = $pdo->prepare("
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 'olympiad_participants'
+          AND column_name = 'school_id'
+        LIMIT 1
+    ");
+    $columnStmt->execute();
+    $hasSchoolColumn = (bool)$columnStmt->fetchColumn();
+
+    if ($hasSchoolColumn) {
+        $participantStmt = $pdo->prepare("
+            INSERT INTO olympiad_participants (olympiad_id, student_id, score, school_id)
+            VALUES (:olympiad_id, :student_id, NULL, :school_id)
+        ");
+        $participantStmt->execute([
+            ':olympiad_id' => $olympiadId,
+            ':student_id' => $studentId,
+            ':school_id' => $schoolId
+        ]);
+    } else {
+        $participantStmt = $pdo->prepare("
+            INSERT INTO olympiad_participants (olympiad_id, student_id, score)
+            VALUES (:olympiad_id, :student_id, NULL)
+        ");
+        $participantStmt->execute([
+            ':olympiad_id' => $olympiadId,
+            ':student_id' => $studentId
+        ]);
+    }
 
     $pdo->commit();
 
