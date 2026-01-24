@@ -86,10 +86,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         isJuryChairman = juryRole === 'председатель жюри';
         const canScore = isJuryChairman && olympiad.status === 'completed';
         const canUpload = isJuryChairman && olympiad.status === 'completed';
-        loadParticipants(id, { allowScoreEdit: canScore, allowUpload: canUpload });
-        if (jurySection) {
-          jurySection.style.display = 'none';
-        }
+        loadParticipants(id, { allowScoreEdit: canScore, allowUpload: canUpload, allowRowOpen: false });
+        loadJuryMembers(window.currentOlympiadId, { allowRowOpen: false });
       } else if (actions) {
         actions.style.display = 'none';
         const participantsTable = document.getElementById('participants-table');
@@ -539,7 +537,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function loadParticipants(olympiadId, options = {}) {
-  const { allowScoreEdit = false, allowUpload = false } = options;
+  const { allowScoreEdit = false, allowUpload = false, allowRowOpen = true } = options;
   try {
     const res = await fetch(`api/get-olympiad-participants.php?id=${olympiadId}`);
     const participants = await res.json();
@@ -596,7 +594,9 @@ async function loadParticipants(olympiadId, options = {}) {
         ${scoreCell}
         ${fileCell}
       `;
-      row.addEventListener('click', () => openParticipantModal(p));
+      if (allowRowOpen) {
+        row.addEventListener('click', () => openParticipantModal(p));
+      }
 
       if (allowScoreEdit) {
         const saveBtn = row.querySelector('.btn-save-score');
@@ -797,7 +797,8 @@ function setupParticipantEditHandler(participantId) {
   });
 }
 
-async function loadJuryMembers(olympiadId) {
+async function loadJuryMembers(olympiadId, options = {}) {
+  const { allowRowOpen = true } = options;
   try {
     const res = await fetch(`api/get-jury-members.php?id=${olympiadId}`);
     const jury = await res.json();
@@ -823,7 +824,9 @@ async function loadJuryMembers(olympiadId) {
         <td>${member.full_name}</td>
         <td>${member.jury_role}</td>
       `;
-      tr.addEventListener('click', () => openJuryModal(member));
+      if (allowRowOpen) {
+        tr.addEventListener('click', () => openJuryModal(member));
+      }
       tableBody.appendChild(tr);
     });
   } catch (err) {
