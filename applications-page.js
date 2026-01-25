@@ -101,12 +101,12 @@ export class ApplicationsPage {
             <tr data-id="${app.id}">
                 <td>#${app.id}</td>
                 <td>
-                    <div class="school-name">${app.short_name}</div>
-                    <div class="school-full-name">${app.full_name}</div>
+                    <div class="school-name">${app.short_name || app.full_name || '-'}</div>
+                    <div class="school-full-name">${app.full_name || '-'}</div>
                 </td>
                 <td>
-                    <div class="director-name">${app.director_fio}</div>
-                    <div class="director-position">${app.director_position}</div>
+                    <div class="director-name">${app.director_fio || '-'}</div>
+                    <div class="director-position">${app.director_position || '-'}</div>
                 </td>
                 <td>${new Date(app.created_at).toLocaleDateString()}</td>
                 <td>
