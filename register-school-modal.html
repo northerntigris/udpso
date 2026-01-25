@@ -2,22 +2,21 @@
     <div class="modal-content">
         <span class="close-modal">&times;</span>
         <h2>Регистрация образовательного учреждения</h2>
+        <p class="form-description">Заполните данные образовательного учреждения для регистрации в системе.</p>
         <form id="register-school-form">
+            <h3>НАИМЕНОВАНИЕ</h3>
             <div class="form-group">
-                <label for="school-full-name">Полное наименование (рус.)</label>
+                <label for="school-full-name">Полное наименование на русском языке</label>
                 <input type="text" id="school-full-name" required>
             </div>
-            
+
+            <h3>место нахождения и адрес юр лица</h3>
             <div class="form-group">
-                <label for="school-short-name">Сокращенное наименование (рус.)</label>
-                <input type="text" id="school-short-name" required>
+                <label for="school-address">Адрес юридического лица</label>
+                <input type="text" id="school-address" required>
             </div>
             
-            <div class="form-group">
-                <label for="school-inn">ИНН</label>
-                <input type="text" id="school-inn" required pattern="\d{10,12}">
-            </div>
-            
+            <h3>сведения о регистрации</h3>
             <div class="form-group">
                 <label for="school-ogrn">ОГРН</label>
                 <input type="text" id="school-ogrn" required pattern="\d{13}">
@@ -48,16 +47,6 @@
             <div class="form-group">
                 <label for="director-position">Должность</label>
                 <input type="text" id="director-position" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="contact-phone">Контактный телефон</label>
-                <input type="tel" id="contact-phone" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="contact-email">Email для обратной связи</label>
-                <input type="email" id="contact-email" required>
             </div>
             
             <button type="submit" class="btn btn-primary">
