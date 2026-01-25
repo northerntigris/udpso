@@ -82,7 +82,7 @@ export class ApplicationsList {
             <div class="application-item" data-id="${app.id}">
                 <i class="fas fa-school application-icon"></i>
                 <div class="application-info">
-                    <div class="application-school">${app.short_name}</div>
+                    <div class="application-school">${app.short_name || app.full_name || '-'}</div>
                     <div class="application-date">
                         ${new Date(app.created_at).toLocaleDateString()}
                     </div>

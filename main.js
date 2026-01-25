@@ -2,7 +2,7 @@
 import { SidebarLoader } from './sidebar.js';
 import { NewsEditor } from './news-editor.js';
 import { AuthModal } from './auth-modal.js';
-import { SchoolRegistrationModal } from './school-registration-modal.js';
+import { JoinPlatformModal } from './join-platform-modal.js';
 
 async function checkAuth() {
     try {
@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const registerBtn = document.getElementById('register-school-btn');
     if (registerBtn) {
         registerBtn.addEventListener('click', function() {
-            SchoolRegistrationModal.open();
+            JoinPlatformModal.open();
         });
     }
 
@@ -145,4 +145,3 @@ document.addEventListener('DOMContentLoaded', function() {
 
     loadNews();
 });
-
