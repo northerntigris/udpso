@@ -2,7 +2,14 @@
 header('Content-Type: application/json');
 require_once 'config.php';
 
-$input = json_decode(file_get_contents('php://input'), true);
+$contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+$input = [];
+
+if (stripos($contentType, 'application/json') !== false) {
+    $input = json_decode(file_get_contents('php://input'), true) ?? [];
+} else {
+    $input = $_POST;
+}
 
 try {
     // Проверяем обязательные поля
@@ -62,6 +69,30 @@ try {
         $contactPhone,
         $contactEmail
     ]);
+
+    if (!empty($_FILES['verification_documents'])) {
+        $uploadDir = __DIR__ . '/uploads/verification-documents';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+
+        $names = $_FILES['verification_documents']['name'] ?? [];
+        $tmpNames = $_FILES['verification_documents']['tmp_name'] ?? [];
+        $errors = $_FILES['verification_documents']['error'] ?? [];
+
+        foreach ((array) $names as $index => $name) {
+            if (($errors[$index] ?? UPLOAD_ERR_OK) !== UPLOAD_ERR_OK) {
+                continue;
+            }
+
+            $tmpName = $tmpNames[$index] ?? '';
+            if ($tmpName && is_uploaded_file($tmpName)) {
+                $safeName = preg_replace('/[^a-zA-Z0-9._-]/', '_', basename($name));
+                $targetName = uniqid('verification_', true) . '_' . $safeName;
+                move_uploaded_file($tmpName, $uploadDir . '/' . $targetName);
+            }
+        }
+    }
     
     echo json_encode(['success' => true]);
     

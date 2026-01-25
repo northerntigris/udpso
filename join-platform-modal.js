@@ -39,23 +39,26 @@ export class JoinPlatformModal {
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
 
-                const formData = {
-                    full_name: document.getElementById('platform-full-name').value,
-                    address: document.getElementById('platform-address').value,
-                    ogrn: document.getElementById('platform-ogrn').value,
-                    registration_date: document.getElementById('platform-registration-date').value,
-                    director_fio: document.getElementById('platform-director-fio').value,
-                    director_inn: document.getElementById('platform-director-inn').value,
-                    director_position: document.getElementById('platform-director-position').value
-                };
+                const formData = new FormData();
+                formData.append('full_name', document.getElementById('platform-full-name').value);
+                formData.append('address', document.getElementById('platform-address').value);
+                formData.append('ogrn', document.getElementById('platform-ogrn').value);
+                formData.append('registration_date', document.getElementById('platform-registration-date').value);
+                formData.append('director_fio', document.getElementById('platform-director-fio').value);
+                formData.append('director_inn', document.getElementById('platform-director-inn').value);
+                formData.append('director_position', document.getElementById('platform-director-position').value);
+
+                const documentsInput = document.getElementById('platform-documents');
+                if (documentsInput?.files?.length) {
+                    Array.from(documentsInput.files).forEach((file) => {
+                        formData.append('verification_documents[]', file);
+                    });
+                }
 
                 try {
                     const response = await fetch('register-school.php', {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(formData)
+                        body: formData
                     });
 
                     const data = await response.json();
