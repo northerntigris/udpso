@@ -1,0 +1,48 @@
+<div id="join-platform-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <h2>Заявка на присоединение к платформе</h2>
+        <form id="join-platform-form">
+            <h3>Наименование</h3>
+            <div class="form-group">
+                <label for="platform-full-name">Полное наименование на русском языке</label>
+                <input type="text" id="platform-full-name" required>
+            </div>
+
+            <h3>Место нахождения и адрес юридического лица</h3>
+            <div class="form-group">
+                <label for="platform-address">Адрес юридического лица</label>
+                <input type="text" id="platform-address" required>
+            </div>
+
+            <h3>Сведения о регистрации</h3>
+            <div class="form-group">
+                <label for="platform-ogrn">ОГРН</label>
+                <input type="text" id="platform-ogrn" required pattern="\d{13}">
+            </div>
+            <div class="form-group">
+                <label for="platform-registration-date">Дата регистрации</label>
+                <input type="date" id="platform-registration-date" required>
+            </div>
+
+            <h3>Сведения о лице, имеющем право без доверенности действовать от имени юридического лица</h3>
+            <div class="form-group">
+                <label for="platform-director-fio">Фамилия, имя, отчество</label>
+                <input type="text" id="platform-director-fio" required>
+            </div>
+            <div class="form-group">
+                <label for="platform-director-inn">ИНН</label>
+                <input type="text" id="platform-director-inn" required pattern="\d{12}">
+            </div>
+            <div class="form-group">
+                <label for="platform-director-position">Должность</label>
+                <input type="text" id="platform-director-position" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-paper-plane"></i>
+                <span>Отправить заявку на присоединение</span>
+            </button>
+        </form>
+    </div>
+</div>

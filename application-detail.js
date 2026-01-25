@@ -30,27 +30,30 @@ export class ApplicationDetail {
     
     static renderApplicationDetails(application) {
         // Заголовок и статус
-        document.getElementById('application-title').textContent = application.short_name;
+        const displayName = application.short_name || application.full_name || '-';
+        document.getElementById('application-title').textContent = displayName;
         const statusBadge = document.getElementById('application-status').querySelector('.status-badge');
         statusBadge.className = `status-badge status-${application.status}`;
         statusBadge.textContent = this.getStatusText(application.status);
         
         // Информация о школе
-        document.getElementById('school-full-name').textContent = application.full_name;
-        document.getElementById('school-short-name').textContent = application.short_name;
-        document.getElementById('school-inn').textContent = application.inn;
-        document.getElementById('school-ogrn').textContent = application.ogrn;
-        document.getElementById('school-ogrn-date').textContent = new Date(application.ogrn_date).toLocaleDateString();
-        document.getElementById('school-address').textContent = application.address;
+        document.getElementById('school-full-name').textContent = application.full_name || '-';
+        document.getElementById('school-short-name').textContent = displayName;
+        document.getElementById('school-inn').textContent = application.inn || '-';
+        document.getElementById('school-ogrn').textContent = application.ogrn || '-';
+        document.getElementById('school-ogrn-date').textContent = application.ogrn_date
+            ? new Date(application.ogrn_date).toLocaleDateString()
+            : '-';
+        document.getElementById('school-address').textContent = application.address || '-';
         
         // Руководитель
-        document.getElementById('director-fio').textContent = application.director_fio;
-        document.getElementById('director-position').textContent = application.director_position;
-        document.getElementById('director-inn').textContent = application.director_inn;
+        document.getElementById('director-fio').textContent = application.director_fio || '-';
+        document.getElementById('director-position').textContent = application.director_position || '-';
+        document.getElementById('director-inn').textContent = application.director_inn || '-';
         
         // Контакты
-        document.getElementById('contact-phone').textContent = application.contact_phone;
-        document.getElementById('contact-email').textContent = application.contact_email;
+        document.getElementById('contact-phone').textContent = application.contact_phone || '-';
+        document.getElementById('contact-email').textContent = application.contact_email || '-';
         
         // История
         document.getElementById('created-at').textContent = new Date(application.created_at).toLocaleString();
