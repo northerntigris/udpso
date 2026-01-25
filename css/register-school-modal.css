@@ -78,11 +78,6 @@
     color: var(--dark-color);
 }
 
-#register-school-modal .form-description {
-    margin: 8px 0 20px;
-    color: #6b7280;
-    font-size: 0.95rem;
-}
 
 #register-school-modal input[type="text"],
 #register-school-modal input[type="tel"],
