@@ -3,229 +3,30 @@
         <span class="close-modal">&times;</span>
         <h2>Регистрация образовательного учреждения</h2>
         <form id="register-school-form">
+            <h3>НАИМЕНОВАНИЕ</h3>
             <div class="form-group">
-                <label for="school-full-name">Полное наименование (рус.)</label>
+                <label for="school-full-name">Полное наименование на русском языке</label>
                 <input type="text" id="school-full-name" required>
             </div>
-            
-            <div class="form-group">
-                <label for="school-short-name">Сокращенное наименование (рус.)</label>
-                <input type="text" id="school-short-name" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="school-inn">ИНН</label>
-                <input type="text" id="school-inn" required pattern="\d{10,12}">
-            </div>
-            
-            <div class="form-group">
-                <label for="school-ogrn">ОГРН</label>
-                <input type="text" id="school-ogrn" required pattern="\d{13}">
-            </div>
-            
-            <div class="form-group">
-                <label for="school-ogrn-date">Дата присвоения ОГРН</label>
-                <input type="date" id="school-ogrn-date" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="school-region">Субъект РФ</label>
-                <input type="text" id="school-region" list="region-list" required>
-                <datalist id="region-list">
-                    <option value="Республика Адыгея"></option>
-                    <option value="Республика Алтай"></option>
-                    <option value="Республика Башкортостан"></option>
-                    <option value="Республика Бурятия"></option>
-                    <option value="Республика Дагестан"></option>
-                    <option value="Республика Ингушетия"></option>
-                    <option value="Кабардино-Балкарская Республика"></option>
-                    <option value="Республика Калмыкия"></option>
-                    <option value="Карачаево-Черкесская Республика"></option>
-                    <option value="Республика Карелия"></option>
-                    <option value="Республика Коми"></option>
-                    <option value="Республика Крым"></option>
-                    <option value="Республика Марий Эл"></option>
-                    <option value="Республика Мордовия"></option>
-                    <option value="Республика Саха (Якутия)"></option>
-                    <option value="Республика Северная Осетия — Алания"></option>
-                    <option value="Республика Татарстан"></option>
-                    <option value="Республика Тыва"></option>
-                    <option value="Удмуртская Республика"></option>
-                    <option value="Республика Хакасия"></option>
-                    <option value="Чеченская Республика"></option>
-                    <option value="Чувашская Республика"></option>
-                    <option value="Алтайский край"></option>
-                    <option value="Забайкальский край"></option>
-                    <option value="Камчатский край"></option>
-                    <option value="Краснодарский край"></option>
-                    <option value="Красноярский край"></option>
-                    <option value="Пермский край"></option>
-                    <option value="Приморский край"></option>
-                    <option value="Ставропольский край"></option>
-                    <option value="Хабаровский край"></option>
-                    <option value="Амурская область"></option>
-                    <option value="Архангельская область"></option>
-                    <option value="Астраханская область"></option>
-                    <option value="Белгородская область"></option>
-                    <option value="Брянская область"></option>
-                    <option value="Владимирская область"></option>
-                    <option value="Волгоградская область"></option>
-                    <option value="Вологодская область"></option>
-                    <option value="Воронежская область"></option>
-                    <option value="Ивановская область"></option>
-                    <option value="Иркутская область"></option>
-                    <option value="Калининградская область"></option>
-                    <option value="Калужская область"></option>
-                    <option value="Кемеровская область — Кузбасс"></option>
-                    <option value="Кировская область"></option>
-                    <option value="Костромская область"></option>
-                    <option value="Курганская область"></option>
-                    <option value="Курская область"></option>
-                    <option value="Ленинградская область"></option>
-                    <option value="Липецкая область"></option>
-                    <option value="Магаданская область"></option>
-                    <option value="Московская область"></option>
-                    <option value="Мурманская область"></option>
-                    <option value="Нижегородская область"></option>
-                    <option value="Новгородская область"></option>
-                    <option value="Новосибирская область"></option>
-                    <option value="Омская область"></option>
-                    <option value="Оренбургская область"></option>
-                    <option value="Орловская область"></option>
-                    <option value="Пензенская область"></option>
-                    <option value="Псковская область"></option>
-                    <option value="Ростовская область"></option>
-                    <option value="Рязанская область"></option>
-                    <option value="Самарская область"></option>
-                    <option value="Саратовская область"></option>
-                    <option value="Сахалинская область"></option>
-                    <option value="Свердловская область"></option>
-                    <option value="Смоленская область"></option>
-                    <option value="Тамбовская область"></option>
-                    <option value="Тверская область"></option>
-                    <option value="Томская область"></option>
-                    <option value="Тульская область"></option>
-                    <option value="Тюменская область"></option>
-                    <option value="Ульяновская область"></option>
-                    <option value="Челябинская область"></option>
-                    <option value="Ярославская область"></option>
-                    <option value="Москва"></option>
-                    <option value="Санкт-Петербург"></option>
-                    <option value="Севастополь"></option>
-                    <option value="Еврейская автономная область"></option>
-                    <option value="Ненецкий автономный округ"></option>
-                    <option value="Ханты-Мансийский автономный округ — Югра"></option>
-                    <option value="Чукотский автономный округ"></option>
-                    <option value="Ямало-Ненецкий автономный округ"></option>
-                    <option value="Донецкая Народная Республика"></option>
-                    <option value="Луганская Народная Республика"></option>
-                    <option value="Запорожская область"></option>
-                    <option value="Херсонская область"></option>
-                </datalist>
-            </div>
 
+            <h3>место нахождения и адрес юр лица</h3>
             <div class="form-group">
                 <label for="school-address">Адрес юридического лица</label>
                 <input type="text" id="school-address" required>
             </div>
+            
+            <h3>сведения о регистрации</h3>
+            <div class="form-group">
+                <label for="school-ogrn">ОГРН</label>
+                <input type="text" id="school-ogrn" required pattern="\d{13}">
+            </div>
 
             <div class="form-group">
-                <label for="school-region">Регион</label>
-                <input type="text" id="school-region" list="region-list" required placeholder="Начните вводить регион">
-                <datalist id="region-list">
-                    <option value="Республика Адыгея"></option>
-                    <option value="Республика Алтай"></option>
-                    <option value="Республика Башкортостан"></option>
-                    <option value="Республика Бурятия"></option>
-                    <option value="Республика Дагестан"></option>
-                    <option value="Республика Ингушетия"></option>
-                    <option value="Кабардино-Балкарская Республика"></option>
-                    <option value="Республика Калмыкия"></option>
-                    <option value="Карачаево-Черкесская Республика"></option>
-                    <option value="Республика Карелия"></option>
-                    <option value="Республика Коми"></option>
-                    <option value="Республика Крым"></option>
-                    <option value="Республика Марий Эл"></option>
-                    <option value="Республика Мордовия"></option>
-                    <option value="Республика Саха (Якутия)"></option>
-                    <option value="Республика Северная Осетия — Алания"></option>
-                    <option value="Республика Татарстан"></option>
-                    <option value="Республика Тыва"></option>
-                    <option value="Удмуртская Республика"></option>
-                    <option value="Республика Хакасия"></option>
-                    <option value="Чеченская Республика"></option>
-                    <option value="Чувашская Республика"></option>
-                    <option value="Алтайский край"></option>
-                    <option value="Забайкальский край"></option>
-                    <option value="Камчатский край"></option>
-                    <option value="Краснодарский край"></option>
-                    <option value="Красноярский край"></option>
-                    <option value="Пермский край"></option>
-                    <option value="Приморский край"></option>
-                    <option value="Ставропольский край"></option>
-                    <option value="Хабаровский край"></option>
-                    <option value="Амурская область"></option>
-                    <option value="Архангельская область"></option>
-                    <option value="Астраханская область"></option>
-                    <option value="Белгородская область"></option>
-                    <option value="Брянская область"></option>
-                    <option value="Владимирская область"></option>
-                    <option value="Волгоградская область"></option>
-                    <option value="Вологодская область"></option>
-                    <option value="Воронежская область"></option>
-                    <option value="Ивановская область"></option>
-                    <option value="Иркутская область"></option>
-                    <option value="Калининградская область"></option>
-                    <option value="Калужская область"></option>
-                    <option value="Кемеровская область — Кузбасс"></option>
-                    <option value="Кировская область"></option>
-                    <option value="Костромская область"></option>
-                    <option value="Курганская область"></option>
-                    <option value="Курская область"></option>
-                    <option value="Ленинградская область"></option>
-                    <option value="Липецкая область"></option>
-                    <option value="Магаданская область"></option>
-                    <option value="Московская область"></option>
-                    <option value="Мурманская область"></option>
-                    <option value="Нижегородская область"></option>
-                    <option value="Новгородская область"></option>
-                    <option value="Новосибирская область"></option>
-                    <option value="Омская область"></option>
-                    <option value="Оренбургская область"></option>
-                    <option value="Орловская область"></option>
-                    <option value="Пензенская область"></option>
-                    <option value="Псковская область"></option>
-                    <option value="Ростовская область"></option>
-                    <option value="Рязанская область"></option>
-                    <option value="Самарская область"></option>
-                    <option value="Саратовская область"></option>
-                    <option value="Сахалинская область"></option>
-                    <option value="Свердловская область"></option>
-                    <option value="Смоленская область"></option>
-                    <option value="Тамбовская область"></option>
-                    <option value="Тверская область"></option>
-                    <option value="Томская область"></option>
-                    <option value="Тульская область"></option>
-                    <option value="Тюменская область"></option>
-                    <option value="Ульяновская область"></option>
-                    <option value="Челябинская область"></option>
-                    <option value="Ярославская область"></option>
-                    <option value="Москва"></option>
-                    <option value="Санкт-Петербург"></option>
-                    <option value="Севастополь"></option>
-                    <option value="Еврейская автономная область"></option>
-                    <option value="Ненецкий автономный округ"></option>
-                    <option value="Ханты-Мансийский автономный округ — Югра"></option>
-                    <option value="Чукотский автономный округ"></option>
-                    <option value="Ямало-Ненецкий автономный округ"></option>
-                    <option value="Донецкая Народная Республика"></option>
-                    <option value="Луганская Народная Республика"></option>
-                    <option value="Запорожская область"></option>
-                    <option value="Херсонская область"></option>
-                </datalist>
+                <label for="school-ogrn-date">Дата регистрации</label>
+                <input type="date" id="school-ogrn-date" required>
             </div>
-            
-            <h3>Сведения о руководителе</h3>
+
+            <h3>сведения о лице, имеющем право без доверенности действовать от имен юр лица</h3>
             
             <div class="form-group">
                 <label for="director-fio">ФИО</label>
@@ -240,16 +41,6 @@
             <div class="form-group">
                 <label for="director-position">Должность</label>
                 <input type="text" id="director-position" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="contact-phone">Контактный телефон</label>
-                <input type="tel" id="contact-phone" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="contact-email">Email для обратной связи</label>
-                <input type="email" id="contact-email" required>
             </div>
             
             <button type="submit" class="btn btn-primary">
