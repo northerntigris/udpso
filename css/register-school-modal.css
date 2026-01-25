@@ -9,7 +9,8 @@
     }
 }
 
-#register-school-modal .modal-content {
+#register-school-modal .modal-content,
+#join-platform-modal .modal-content {
     background: white;
     padding: 30px;
     border-radius: var(--border-radius);
@@ -32,7 +33,8 @@
     color: #666;
 } */
 
-#register-school-modal .close-modal {
+#register-school-modal .close-modal,
+#join-platform-modal .close-modal {
     position: sticky;
     top: 10px;
     left: 100%;
@@ -47,12 +49,14 @@
     z-index: 10;
 }
 
-#register-school-modal .close-modal:hover {
+#register-school-modal .close-modal:hover,
+#join-platform-modal .close-modal:hover {
     color: #333;
 }
 
 /* Стили для заголовков внутри формы */
-#register-school-modal h3 {
+#register-school-modal h3,
+#join-platform-modal h3 {
     margin: 25px 0 15px;
     color: var(--dark-color);
     font-size: 1.2rem;
@@ -61,11 +65,13 @@
 }
 
 /* Стили для групп полей формы */
-#register-school-modal .form-group {
+#register-school-modal .form-group,
+#join-platform-modal .form-group {
     margin-bottom: 20px;
 }
 
-#register-school-modal label {
+#register-school-modal label,
+#join-platform-modal label {
     display: block;
     margin-bottom: 8px;
     font-weight: 500;
@@ -76,7 +82,13 @@
 #register-school-modal input[type="tel"],
 #register-school-modal input[type="email"],
 #register-school-modal input[type="date"],
-#register-school-modal textarea {
+#register-school-modal textarea,
+#join-platform-modal input[type="text"],
+#join-platform-modal input[type="tel"],
+#join-platform-modal input[type="email"],
+#join-platform-modal input[type="date"],
+#join-platform-modal input[type="file"],
+#join-platform-modal textarea {
     width: 100%;
     padding: 12px;
     border: 1px solid #ddd;
@@ -86,14 +98,17 @@
 }
 
 #register-school-modal input:focus,
-#register-school-modal textarea:focus {
+#register-school-modal textarea:focus,
+#join-platform-modal input:focus,
+#join-platform-modal textarea:focus {
     border-color: var(--accent-color);
     outline: none;
     box-shadow: 0 0 0 3px rgba(72, 149, 239, 0.1);
 }
 
 /* Стили для кнопки отправки */
-#register-school-modal .btn-primary {
+#register-school-modal .btn-primary,
+#join-platform-modal .btn-primary {
     background: var(--primary-color);
     color: white;
     border: none;
@@ -111,23 +126,27 @@
     margin-top: 20px;
 }
 
-#register-school-modal .btn-primary:hover {
+#register-school-modal .btn-primary:hover,
+#join-platform-modal .btn-primary:hover {
     background: var(--secondary-color);
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-#register-school-modal .btn-primary i {
+#register-school-modal .btn-primary i,
+#join-platform-modal .btn-primary i {
     font-size: 1rem;
 }
 
 /* Адаптивность для мобильных устройств */
 @media (max-width: 768px) {
-    #register-school-modal .modal-content {
+    #register-school-modal .modal-content,
+    #join-platform-modal .modal-content {
         padding: 20px 15px;
     }
     
-    #register-school-modal h3 {
+    #register-school-modal h3,
+    #join-platform-modal h3 {
         margin: 20px 0 10px;
     }
 }
@@ -135,26 +154,31 @@
 /* Добавим в конец файла */
 
 /* Стилизация скроллбара */
-#register-school-modal .modal-content::-webkit-scrollbar {
+#register-school-modal .modal-content::-webkit-scrollbar,
+#join-platform-modal .modal-content::-webkit-scrollbar {
     width: 8px;
 }
 
-#register-school-modal .modal-content::-webkit-scrollbar-track {
+#register-school-modal .modal-content::-webkit-scrollbar-track,
+#join-platform-modal .modal-content::-webkit-scrollbar-track {
     background: #f1f1f1;
     border-radius: 10px;
 }
 
-#register-school-modal .modal-content::-webkit-scrollbar-thumb {
+#register-school-modal .modal-content::-webkit-scrollbar-thumb,
+#join-platform-modal .modal-content::-webkit-scrollbar-thumb {
     background: var(--accent-color);
     border-radius: 10px;
 }
 
-#register-school-modal .modal-content::-webkit-scrollbar-thumb:hover {
+#register-school-modal .modal-content::-webkit-scrollbar-thumb:hover,
+#join-platform-modal .modal-content::-webkit-scrollbar-thumb:hover {
     background: var(--primary-color);
 }
 
 /* Фиксируем крестик */
-#register-school-modal .close-modal {
+#register-school-modal .close-modal,
+#join-platform-modal .close-modal {
     position: sticky;
     top: 10px;
     left: 100%;
@@ -167,4 +191,27 @@
     justify-content: center;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     z-index: 10;
+}
+
+#join-platform-modal .form-section {
+    padding: 18px;
+    border: 1px solid #eee;
+    border-radius: var(--border-radius);
+    background: #fbfbfd;
+    margin-bottom: 20px;
+}
+
+#join-platform-modal .form-section h3 {
+    margin-top: 0;
+}
+
+#join-platform-modal input[type="file"] {
+    padding: 10px 12px;
+    background: white;
+}
+
+#join-platform-modal .form-hint {
+    margin-top: 8px;
+    font-size: 0.9rem;
+    color: #6b7280;
 }
